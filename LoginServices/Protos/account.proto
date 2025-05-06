@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option csharp_namespace = "AccountService.Grpc";
+option csharp_namespace = "AccountServer.Grpc";
 package account;
 
 service AccountService {

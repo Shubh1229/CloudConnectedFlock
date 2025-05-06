@@ -1,15 +1,15 @@
 ﻿using System.Threading.Tasks;
 using Grpc.Core;
-using AccountServer.Grpc;
-using AccountServer.AccountData;
-using AccountServer.AccountModels;
+using AccountService.Grpc;
+using AccountService.AccountData;
+using AccountService.AccountModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using AccountServer.Security;
+using AccountService.Security;
 
-namespace AccountServer.GrpcServices
+namespace AccountService.GrpcServices
 {
-    public class AccountServiceImpl : AccountService.AccountServiceBase
+    public class AccountServiceImpl : AccountService.Grpc.AccountService.AccountServiceBase
     {
         private readonly AccountDbContext dbContext;
         private readonly ILogger<AccountServiceImpl> logger;
@@ -31,7 +31,8 @@ namespace AccountServer.GrpcServices
                 Username = request.Username,
                 Email = request.Email,
                 PasswordHash = hash,
-                PasswordKey = key
+                PasswordKey = key,
+                Birthday = DateOnly.Parse(request.Birthday)
             };
 
             logger.LogInformation("Checking if Account Username Already Exists in Database");
@@ -56,7 +57,8 @@ namespace AccountServer.GrpcServices
 
 
             logger.LogInformation("Account Successfully Persisted to DB");
-            return new CreateAccountReply {
+            return new CreateAccountReply
+            {
                 Success = true,
                 Message = "Account Created Successfully!"
             };

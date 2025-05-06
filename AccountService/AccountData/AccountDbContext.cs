@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using AccountServer.AccountModels;
+using AccountService.AccountModels;
 
-namespace AccountServer.AccountData
+namespace AccountService.AccountData
 {
     public class AccountDbContext : DbContext
     {

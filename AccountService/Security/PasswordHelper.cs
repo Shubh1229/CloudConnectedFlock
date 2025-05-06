@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace AccountServer.Security
+namespace AccountService.Security
 {
     public static class PasswordHelper
     {
