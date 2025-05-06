@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option csharp_namespace = "HeartBeatService.Grpc";
+
+package heartbeat;
+
+import "google/protobuf/timestamp.proto";
+
+service HeartBeatService {
+  rpc CheckOnline (HeartbeatRequest) returns (HeartbeatReply);
+}
+
+message HeartbeatRequest {
+  string service_name = 1;
+  google.protobuf.Timestamp timestamp = 2;
+}
+
+message HeartbeatReply {
+  string message = 1;
+  google.protobuf.Timestamp received_at = 2;
+}
