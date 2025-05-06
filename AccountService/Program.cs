@@ -33,4 +33,11 @@ app.MapControllers();
 
 app.MapGrpcService<AccountService.GrpcServices.AccountServiceImpl>();
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AccountDbContext>();
+    db.Database.Migrate();
+}
+
+
 app.Run();
