@@ -9,6 +9,10 @@ namespace LoginServices.Controllers
     [Route("[controller]")]
     public class LoginController : ControllerBase
     {
+        
+        private static readonly GrpcChannel channel = GrpcChannel.ForAddress("http://account-service:9000");
+        
+        private static readonly AccountService.AccountServiceClient client = new AccountService.AccountServiceClient(channel);
         private readonly ILogger logger;
         public LoginController(ILogger<LoginController> logger)
         {
@@ -17,10 +21,7 @@ namespace LoginServices.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] Credentials loginRequest)
         {
-            logger.LogInformation("Setting Grpc Channel");
-            using var channel = GrpcChannel.ForAddress("http://account-service:9000");
-            logger.LogInformation("Setting Grpc Client");
-            var client = new AccountService.AccountServiceClient(channel);
+
 
             logger.LogInformation("Sending GetUserRequest Waiting for Reply...");
             var reply = await client.GetAccountAsync(
@@ -57,9 +58,7 @@ namespace LoginServices.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] AccountRegistration request)
         {
-            logger.LogInformation("Setting Grpc Channel");
-            using var channel = GrpcChannel.ForAddress("http://account-service:9000");
-            logger.LogInformation("Setting Grpc Client");
+            
             var client = new AccountService.AccountServiceClient(channel);
 
             logger.LogInformation("Sending GetUserRequest Waiting for Reply...");

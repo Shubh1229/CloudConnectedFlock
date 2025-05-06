@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -20,7 +21,8 @@ namespace AccountService.Migrations
                     Username = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
                     PasswordHash = table.Column<byte[]>(type: "bytea", nullable: true),
-                    PasswordKey = table.Column<byte[]>(type: "bytea", nullable: true)
+                    PasswordKey = table.Column<byte[]>(type: "bytea", nullable: true),
+                    Birthday = table.Column<DateOnly>(type: "date", nullable: false)
                 },
                 constraints: table =>
                 {

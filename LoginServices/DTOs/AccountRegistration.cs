@@ -2,12 +2,12 @@
 {
     public class AccountRegistration
     {
-        public required string Username;
+        public required string Username { get; set; }
 
-        public required string Password;
+        public required string Password {  get; set; }
 
-        public required string Email;
+        public required string Email {  get; set; }
 
-        public required DateOnly Birthday;
+        public required DateOnly Birthday {  get; set; }
     }
 }

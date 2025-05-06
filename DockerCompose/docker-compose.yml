@@ -1,0 +1,51 @@
+
+
+version: '3.8'
+
+services:
+    postgres:
+        image: postgres:15
+        container_name: accounts-postgres-db
+        restart: always
+        environment:
+            POSTGRES_USER: shubh
+            POSTGRES_PASSWORD: 8342AdksnAKe
+            POSTGRES_DB: accountsdb
+        ports:
+            - "5432:5432"
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+        networks:
+            - ccflocknet
+
+    account-service:
+        build:
+            context: ../AccountService
+            dockerfile: Dockerfile
+        ports:
+            - "9000:9000"
+        environment:
+            - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=accountsdb;Username=shubh;Password=8342AdksnAKe
+        depends_on:
+            - postgres
+        networks:
+            - ccflocknet
+    
+    login-service:
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development
+        build:
+            context: ../
+            dockerfile: LoginServices/Dockerfile
+        ports:
+            - "5000:80"
+            - "5001:443"
+        depends_on:
+            - account-service
+        networks:
+            - ccflocknet
+volumes:
+    pgdata:
+
+networks:
+  ccflocknet:
