@@ -1,6 +1,6 @@
 ﻿
 
-namespace AccountServer.AccountModels
+namespace AccountService.AccountModels
 {
     public class UserAccount
     {
@@ -13,6 +13,8 @@ namespace AccountServer.AccountModels
         public byte[]? PasswordHash { get; set; }
 
         public byte[]? PasswordKey { get; set; }
+
+        public required DateOnly Birthday { get; set; }
 
     }
 }

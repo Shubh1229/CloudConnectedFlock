@@ -3,7 +3,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace AccountServer.Migrations
+namespace AccountService.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -19,7 +19,8 @@ namespace AccountServer.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Username = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
-                    Password = table.Column<string>(type: "text", nullable: false)
+                    PasswordHash = table.Column<byte[]>(type: "bytea", nullable: true),
+                    PasswordKey = table.Column<byte[]>(type: "bytea", nullable: true)
                 },
                 constraints: table =>
                 {

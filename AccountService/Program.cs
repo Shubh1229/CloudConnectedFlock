@@ -1,6 +1,6 @@
-using AccountServer.AccountData;
+using AccountService.AccountData;
 using Microsoft.EntityFrameworkCore;
-using AccountServer.GrpcServices;
+using AccountService.GrpcServices;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,6 +31,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapGrpcService<AccountServer.GrpcServices.AccountServiceImpl>();
+app.MapGrpcService<AccountService.GrpcServices.AccountServiceImpl>();
 
 app.Run();
