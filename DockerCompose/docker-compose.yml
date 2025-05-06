@@ -33,7 +33,7 @@ services:
     
     login-service:
         environment:
-            - ASPNETCORE_ENVIRONMENT=Development
+            - ASPNETCORE_ENVIRONMENT=Production
         build:
             context: ../
             dockerfile: LoginServices/Dockerfile
