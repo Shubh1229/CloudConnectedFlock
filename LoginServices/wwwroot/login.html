@@ -86,6 +86,10 @@
 
             const result = await response.json();
 
+            if (result.token) {
+                localStorage.setItem('jwt', result.token); // ✅ save token
+            }
+
             switch (result.result) {
                 case 4: // Success
                     window.location.href = '/hub.html';
