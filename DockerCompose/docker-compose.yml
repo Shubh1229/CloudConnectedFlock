@@ -7,7 +7,7 @@ services:
         image: postgres:15
         container_name: accounts-postgres-db
         restart: always
-        platform: linux/arm64
+        platform: linux/amd64
         environment:
             POSTGRES_USER: shubh
             POSTGRES_PASSWORD: 8342AdksnAKe
@@ -20,7 +20,7 @@ services:
             - ccflocknet
 
     account-service:
-        platform: linux/arm64
+        platform: linux/amd64
         build:
             context: ../AccountService
             dockerfile: Dockerfile
@@ -34,7 +34,7 @@ services:
             - ccflocknet
     
     login-service:
-        platform: linux/arm64
+        platform: linux/amd64
         environment:
             - ASPNETCORE_ENVIRONMENT=Production
             - Jwt__Key=7bATceklEQce5y28HMFU1YwYJcBna4Jz
@@ -42,8 +42,8 @@ services:
             context: ../
             dockerfile: LoginServices/Dockerfile
         ports:
-            - "5000:80"
-            - "5001:443"
+            - "5001:80"
+            - "5002:443"
         depends_on:
             - account-service
             - heartbeat-service
@@ -51,7 +51,7 @@ services:
             - ccflocknet
     
     heartbeat-service:
-        platform: linux/arm64
+        platform: linux/amd64
         build:
             context: ../
             dockerfile: HeartBeatService/Dockerfile
