@@ -17,10 +17,13 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+	  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
   </ItemGroup>
 
 	<ItemGroup>
 		<Protobuf Include="Protos\account.proto" GrpcServices="Client" />
+		<Protobuf Include="Protos\heartbeat.proto" GrpcServices="Client">
+		</Protobuf>
 	</ItemGroup>
 
 	<ItemGroup>

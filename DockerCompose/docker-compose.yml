@@ -34,6 +34,7 @@ services:
     login-service:
         environment:
             - ASPNETCORE_ENVIRONMENT=Production
+            - Jwt__Key=7bATceklEQce5y28HMFU1YwYJcBna4Jz
         build:
             context: ../
             dockerfile: LoginServices/Dockerfile
@@ -42,8 +43,29 @@ services:
             - "5001:443"
         depends_on:
             - account-service
+            - heartbeat-service
         networks:
             - ccflocknet
+    
+    heartbeat-service:
+        build:
+            context: ../
+            dockerfile: HeartBeatService/Dockerfile
+        ports:
+            - "9005:9005"
+        depends_on:
+            - redis
+        networks:
+            - ccflocknet
+    
+    redis:
+        image: redis:7
+        container_name: online-users-redis-db
+        ports:
+            - "6379:6379"
+        networks:
+            - ccflocknet
+
 volumes:
     pgdata:
 

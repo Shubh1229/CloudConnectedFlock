@@ -14,16 +14,20 @@ namespace HeartBeatService
             builder.Services.AddGrpc();
 
             builder.Services.AddSingleton<IConnectionMultiplexer>(
-                ConnectionMultiplexer.Connect("redis:6379") 
+                ConnectionMultiplexer.Connect("online-users-redis-db:6379") 
             );
+
+            builder.WebHost.ConfigureKestrel(serverOptions =>
+            {
+                serverOptions.Configure(builder.Configuration.GetSection("Kestrel"));
+            });
 
             builder.Services.AddSingleton<HeartBeatRedisService>();
 
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            //app.MapGrpcService<GreeterService>();
-            //app.MapGrpcService<Services.HeartBeatServiceImpl>();
+            app.MapGrpcService<HeartBeatServiceImpl>();
 
             app.Run();
         }

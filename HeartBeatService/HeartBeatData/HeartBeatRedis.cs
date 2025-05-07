@@ -8,9 +8,11 @@ namespace HeartBeatService.HeartBeatModels
     public class HeartBeatRedisService
     {
         private readonly IDatabase dB;
+        private readonly IConnectionMultiplexer redis;
         public HeartBeatRedisService(IConnectionMultiplexer redis)
         {
             dB = redis.GetDatabase();
+            this.redis = redis;
         }
 
         public async Task SetStatus(HeartBeatStatus status)
@@ -30,6 +32,26 @@ namespace HeartBeatService.HeartBeatModels
                 return null;
             }
             return json.HasValue ? JsonSerializer.Deserialize<HeartBeatStatus>(json) : null;
+        }
+
+        public async Task<List<String>> GetAllOnlineUsers()
+        {
+            var server = redis.GetServer(redis.GetEndPoints()[0]);
+            var keys = server.Keys(pattern: "status:*");
+            var result = new List<String>();
+            foreach ( var key in keys)
+            {
+                var value = await dB.StringGetAsync(key);
+                if (value != RedisValue.Null && value.HasValue)
+                {
+                    var status = JsonSerializer.Deserialize<HeartBeatStatus>(value);
+                    if (status != null && status.Online)
+                    {
+                        result.Add(status.Username);
+                    }
+                }
+            }
+            return result;
         }
     }
 }

@@ -1,7 +1,12 @@
 ﻿using AccountServer.Grpc;
+using HeartBeatService.Grpc;
 using Grpc.Net.Client;
 using LoginServices.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace LoginServices.Controllers
 {
@@ -13,10 +18,18 @@ namespace LoginServices.Controllers
         private static readonly GrpcChannel channel = GrpcChannel.ForAddress("http://account-service:9000");
         
         private static readonly AccountService.AccountServiceClient client = new AccountService.AccountServiceClient(channel);
+
+        private static readonly GrpcChannel heartbeatChannel = GrpcChannel.ForAddress("http://heartbeat-service:9005");
+
+        private static readonly HeartBeatService.Grpc.HeartBeatService.HeartBeatServiceClient heartbeatClient = new HeartBeatService.Grpc.HeartBeatService.HeartBeatServiceClient(heartbeatChannel);
+
+        private readonly IConfiguration config;
+        
         private readonly ILogger logger;
-        public LoginController(ILogger<LoginController> logger)
+        public LoginController(ILogger<LoginController> logger, IConfiguration config)
         {
             this.logger = logger;
+            this.config = config;
         }
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] Credentials loginRequest)
@@ -41,17 +54,48 @@ namespace LoginServices.Controllers
                 return StatusCode(500, "Unknown error from server.");
             }
 
-            switch (reply.MessageType)
+            if (reply.MessageType != 4)
             {
-                case 1: return NotFound(reply.Message);
+                logger.LogInformation("Reply Returned");
+                return Ok(new
+                {
+                    result = reply.MessageType,
+                    message = reply.Message
+                });
+            } else
+            {
+                logger.LogInformation("HeartBeat Sent");
+                await heartbeatClient.SendHeartbeatAsync(new HeartbeatRequest
+                {
+                    Username = loginRequest.Username,
+                });
 
-                case 2: return Conflict(reply.Message);
+                logger.LogInformation("Generating token...");
+                var tokenHandler = new JwtSecurityTokenHandler();
+                logger.LogInformation("Getting Token Key...");
+                var key = Encoding.UTF8.GetBytes(config["Jwt:Key"]);
 
-                case 3: return BadRequest(reply.Message);
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new[]
+                    {
+                        new Claim(ClaimTypes.Name, loginRequest.Username),
+                    }),
+                    Expires = DateTime.UtcNow.AddHours(2),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                };
 
-                case 4: return Ok(reply.Message);
+                var token = tokenHandler.CreateJwtSecurityToken(tokenDescriptor);
+                logger.LogInformation("Created JWT Security Token ...");
+                var tokenString = tokenHandler.WriteToken(token);
 
-                default: return StatusCode(500, "Unknown error from server.");
+                logger.LogInformation("Reply Returned");
+                return Ok(new
+                {
+                    result = reply.MessageType,
+                    message = reply.Message,
+                    token = tokenString
+                });
             }
             
         }
@@ -71,12 +115,13 @@ namespace LoginServices.Controllers
             if (reply == null)
             {
                 return StatusCode(500, "Unknown error from server.");
-            } else if (reply.Success) {
-                return Accepted(reply.Message);
-            } else
+            } 
+
+            return Ok( new
             {
-                return BadRequest(reply.Message);
-            }
+                result = reply.MessageType,
+                message = reply.Message
+            });
 
         }
 

@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Register - Cloud Connected Flock</title>
+    <link rel="icon" type="image/png" href="/logo/CCFlock%20Logo.png">
     <style>
         body {
             background-color: #0b1e3f;
@@ -69,22 +70,40 @@
     <a href="/login.html">Already have an account? Log in</a>
 
     <script>
-    document.getElementById('registerForm').addEventListener('submit', async function (e) {
-      e.preventDefault();
-      const username = document.getElementById('username').value;
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const birthday = document.getElementById('birthday').value;
+        document.getElementById('registerForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
 
-      const response = await fetch('/Login/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password, birthday })
-      });
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const birthday = document.getElementById('birthday').value;
 
-      const text = await response.text();
-      alert(text);
-    });
+            const response = await fetch('/Login/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password, birthday })
+            });
+
+
+            const result = await response.json();
+
+            switch (result.result) {
+                case 3: // Success
+                    alert("Account created!");
+                    window.location.href = '/login.html';
+                    break;
+                case 2: // Email already in use
+                    alert("That email is already registered.");
+                    break;
+                case 1: // Username taken
+                    alert("That username is already taken.");
+                    break;
+                default:
+                    alert(result.message || "An unexpected error occurred.");
+                    break;
+            }
+        });
     </script>
+
 </body>
 </html>
