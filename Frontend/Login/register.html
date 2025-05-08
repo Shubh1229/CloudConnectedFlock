@@ -1,0 +1,109 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - Cloud Connected Flock</title>
+    <link rel="icon" type="image/png" href="logo/CCFlock%20Logo.png">
+    <style>
+        body {
+            background-color: #0b1e3f;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px;
+        }
+
+        img {
+            max-width: 200px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        form {
+            background-color: #1b2d52;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        input {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            border: none;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #3c6eec;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        a {
+            margin-top: 10px;
+            color: #ccc;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <img src="logo/CCFlock%20Logo.png" alt="Cloud Connected Flock Logo" />
+    <h1>Create an Account</h1>
+    <form id="registerForm">
+        <input type="text" id="username" placeholder="Username" required />
+        <input type="email" id="email" placeholder="Email" required />
+        <input type="password" id="password" placeholder="Password" required />
+        <input type="date" id="birthday" required />
+        <button type="submit">Register</button>
+    </form>
+    <a href="login.html">Already have an account? Log in</a>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const birthday = document.getElementById('birthday').value;
+
+            const response = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password, birthday })
+            });
+
+
+            const result = await response.json();
+
+            switch (result.result) {
+                case 3: // Success
+                    alert("Account created!");
+                    window.location.href = 'login.html';
+                    break;
+                case 2: // Email already in use
+                    alert("That email is already registered.");
+                    break;
+                case 1: // Username taken
+                    alert("That username is already taken.");
+                    break;
+                default:
+                    alert(result.message || "An unexpected error occurred.");
+                    break;
+            }
+        });
+    </script>
+
+</body>
+</html>

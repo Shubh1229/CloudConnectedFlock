@@ -26,6 +26,7 @@ services:
             - "9000:9000"
         environment:
             - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=accountsdb;Username=shubh;Password=8342AdksnAKe
+            - Jwt__Key=7bATceklEQce5y28HMFU1YwYJcBna4Jz
         depends_on:
             - postgres
         networks:
@@ -48,6 +49,8 @@ services:
             - ccflocknet
     
     heartbeat-service:
+        environment:
+            - Jwt__Key=7bATceklEQce5y28HMFU1YwYJcBna4Jz
         build:
             context: ../
             dockerfile: HeartBeatService/Dockerfile
@@ -58,11 +61,41 @@ services:
         networks:
             - ccflocknet
     
+    hub-service:
+        build:
+            context: ../
+            dockerfile: HubService/Dockerfile
+        environment:
+            - Jwt__Key=7bATceklEQce5y28HMFU1YwYJcBna4Jz
+            - HeartbeatService__Address=http://heartbeat-service:9005
+        ports:
+            - "5002:80"
+            - "5003:443"
+        depends_on:
+            - login-service
+            - heartbeat-service
+        networks:
+            - ccflocknet
+
     redis:
         image: redis:7
         container_name: online-users-redis-db
         ports:
             - "6379:6379"
+        networks:
+            - ccflocknet
+    
+    nginx:
+        image: nginx:stable
+        ports:
+            - "80:80"
+        volumes:
+            - ../nginx/conf.d:/etc/nginx/conf.d:ro
+            - ../Frontend:/usr/share/nginx/html:ro
+        depends_on:
+            - login-service
+            - heartbeat-service
+            - account-service
         networks:
             - ccflocknet
 

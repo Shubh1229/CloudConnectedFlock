@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace HubService.Controllers
+namespace HubServices.Controllers
 {
     [ApiController]
     [Route("[controller]")]

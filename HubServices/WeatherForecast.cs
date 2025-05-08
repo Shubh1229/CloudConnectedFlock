@@ -1,4 +1,4 @@
-namespace HubService
+namespace HubServices
 {
     public class WeatherForecast
     {
