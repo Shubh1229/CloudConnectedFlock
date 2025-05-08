@@ -7,6 +7,7 @@ services:
         image: postgres:15
         container_name: accounts-postgres-db
         restart: always
+        
         environment:
             POSTGRES_USER: shubh
             POSTGRES_PASSWORD: 8342AdksnAKe
@@ -19,6 +20,7 @@ services:
             - ccflocknet
 
     account-service:
+        
         build:
             context: ../AccountService
             dockerfile: Dockerfile
@@ -33,6 +35,7 @@ services:
             - ccflocknet
     
     login-service:
+        
         environment:
             - ASPNETCORE_ENVIRONMENT=Production
             - Jwt__Key=7bATceklEQce5y28HMFU1YwYJcBna4Jz
@@ -80,6 +83,7 @@ services:
     redis:
         image: redis:7
         container_name: online-users-redis-db
+        
         ports:
             - "6379:6379"
         networks:
