@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project is a microservice-based backend system built with **.NET 7**, designed to handle **user account registration** and **login** using **gRPC communication** between services. It's suitable for cloud deployment and serves as the foundational authentication layer of a larger distributed system.
+This project is a microservice-based backend system built with **.NET 8**, designed to handle **user account registration** and **login** using **gRPC communication** between services. It's suitable for cloud deployment and serves as the foundational authentication layer of a larger distributed system.
 
 The solution includes:
 
