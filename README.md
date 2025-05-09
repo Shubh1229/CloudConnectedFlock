@@ -59,7 +59,7 @@ The solution includes:
 
 ### 🔧 Prerequisites
 
-- [.NET 7 SDK](https://dotnet.microsoft.com/download)
+- [.NET 8 SDK](https://dotnet.microsoft.com/download)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop)
 
 ### 📦 Run with Docker Compose
