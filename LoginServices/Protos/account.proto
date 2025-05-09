@@ -18,6 +18,7 @@ message CreateAccountRequest {
 message CreateAccountReply {
   bool success = 1;
   string message = 2;
+  int64 messageType = 3;
 }
 
 message GetAccountRequest {

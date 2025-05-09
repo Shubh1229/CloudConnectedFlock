@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Register - Cloud Connected Flock</title>
-    <link rel="icon" type="image/png" href="/logo/CCFlock%20Logo.png">
+    <title>Login - Cloud Connected Flock</title>
+    <link rel="icon" type="image/png" href="logo/CCFlock%20Logo.png">
     <style>
         body {
             background-color: #0b1e3f;
@@ -58,48 +58,50 @@
     </style>
 </head>
 <body>
-    <img src="/logo/CCFlock%20Logo.png" alt="Cloud Connected Flock Logo" />
-    <h1>Create an Account</h1>
-    <form id="registerForm">
+    <img src="logo/CCFlock%20Logo.png" alt="Cloud Connected Flock Logo" />
+    <h1>Cloud Connected Flock</h1>
+    <form id="loginForm">
         <input type="text" id="username" placeholder="Username" required />
-        <input type="email" id="email" placeholder="Email" required />
         <input type="password" id="password" placeholder="Password" required />
-        <input type="date" id="birthday" required />
-        <button type="submit">Register</button>
+        <button type="submit">Login</button>
     </form>
-    <a href="/login.html">Already have an account? Log in</a>
+    <a href="register.html">Don't have an account? Create one</a>
 
     <script>
-        document.getElementById('registerForm').addEventListener('submit', async function (e) {
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
             e.preventDefault();
-
             const username = document.getElementById('username').value;
-            const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const birthday = document.getElementById('birthday').value;
 
-            const response = await fetch('/Login/register', {
+            const response = await fetch('/api/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, email, password, birthday })
+                body: JSON.stringify({ username, password })
             });
 
+            if (!response.ok) {
+                alert("Network error.");
+                return;
+            }
 
             const result = await response.json();
 
+            if (result.token) {
+                localStorage.setItem('jwt', result.token); // ✅ save token
+            }
+
             switch (result.result) {
-                case 3: // Success
-                    alert("Account created!");
-                    window.location.href = '/login.html';
+                case 4: // Success
+                    window.location.href = '/hub/hub.html';
                     break;
-                case 2: // Email already in use
-                    alert("That email is already registered.");
+                case 3: // Invalid credentials
+                    alert("Incorrect username or password.");
                     break;
-                case 1: // Username taken
-                    alert("That username is already taken.");
+                case 1: // User not found
+                    alert("User not found.");
                     break;
                 default:
-                    alert(result.message || "An unexpected error occurred.");
+                    alert(result.message || "An error occurred.");
                     break;
             }
         });
@@ -107,3 +109,4 @@
 
 </body>
 </html>
+

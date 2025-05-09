@@ -4,30 +4,27 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>463cb7a4-7bc5-448c-aeea-64132fb624b2</UserSecretsId>
+    <UserSecretsId>99fbd2d5-4c1b-4d57-bdca-22d3f21d4de2</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.30.2" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
     <PackageReference Include="Grpc.Net.Client" Version="2.71.0" />
-    <PackageReference Include="Grpc.Tools" Version="2.71.0">
+    <PackageReference Include="Grpc.Tools" Version="2.72.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.9.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageReference Include="MQTTnet" Version="4.1.*" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1" />
 	  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
   </ItemGroup>
 
-	<ItemGroup>
-		<Protobuf Include="Protos\account.proto" GrpcServices="Client" />
-		<Protobuf Include="Protos\heartbeat.proto" GrpcServices="Client">
-		</Protobuf>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="wwwroot\logo\" />
-	</ItemGroup>
+  <ItemGroup>
+    <Protobuf Include="Protos\heartbeat.proto" GrpcServices="Client" />
+  </ItemGroup>
 
 </Project>

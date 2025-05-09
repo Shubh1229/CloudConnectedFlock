@@ -4,26 +4,27 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER $APP_UID
 WORKDIR /app
-EXPOSE 9005
+EXPOSE 8080
+EXPOSE 8081
 
 
 # This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["HeartBeatService/HeartBeatService.csproj", "HeartBeatService/"]
-RUN dotnet restore "./HeartBeatService/HeartBeatService.csproj"
+COPY ["HubServices/HubServices.csproj", "HubServices/"]
+RUN dotnet restore "./HubServices/HubServices.csproj"
 COPY . .
-WORKDIR "/src/HeartBeatService"
-RUN dotnet build "./HeartBeatService.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/HubServices"
+RUN dotnet build "./HubServices.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./HeartBeatService.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./HubServices.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "HeartBeatService.dll"]
+ENTRYPOINT ["dotnet", "HubServices.dll"]
