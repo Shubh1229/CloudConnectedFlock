@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Register - Cloud Connected Flock</title>
-    <link rel="icon" type="image/png" href="/logo/CCFlock%20Logo.png">
+    <link rel="icon" type="image/png" href="logo/CCFlock%20Logo.png">
     <style>
         body {
             background-color: #0b1e3f;
@@ -58,7 +58,7 @@
     </style>
 </head>
 <body>
-    <img src="/logo/CCFlock%20Logo.png" alt="Cloud Connected Flock Logo" />
+    <img src="logo/CCFlock%20Logo.png" alt="Cloud Connected Flock Logo" />
     <h1>Create an Account</h1>
     <form id="registerForm">
         <input type="text" id="username" placeholder="Username" required />
@@ -67,7 +67,7 @@
         <input type="date" id="birthday" required />
         <button type="submit">Register</button>
     </form>
-    <a href="/login.html">Already have an account? Log in</a>
+    <a href="login.html">Already have an account? Log in</a>
 
     <script>
         document.getElementById('registerForm').addEventListener('submit', async function (e) {
@@ -78,7 +78,7 @@
             const password = document.getElementById('password').value;
             const birthday = document.getElementById('birthday').value;
 
-            const response = await fetch('/Login/register', {
+            const response = await fetch('/api/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, email, password, birthday })
@@ -90,7 +90,7 @@
             switch (result.result) {
                 case 3: // Success
                     alert("Account created!");
-                    window.location.href = '/login.html';
+                    window.location.href = 'login.html';
                     break;
                 case 2: // Email already in use
                     alert("That email is already registered.");

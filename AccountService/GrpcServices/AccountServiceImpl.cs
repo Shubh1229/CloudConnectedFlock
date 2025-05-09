@@ -46,7 +46,21 @@ namespace AccountService.GrpcServices
                 return new CreateAccountReply
                 {
                     Success = false,
-                    Message = "This Account Already Exists Please Change the username"
+                    Message = "This Account Username Already Exists Please Change Your Username",
+                    MessageType = 1
+                };
+            }
+
+            exists = await dbContext.UserAccounts.AnyAsync(a => a.Email == request.Email);
+
+            if (exists)
+            {
+                logger.LogInformation($"Email {request.Email} Already Exists in DB");
+                return new CreateAccountReply
+                {
+                    Success = false,
+                    Message = "This Email is Already in Use",
+                    MessageType = 2
                 };
             }
 
@@ -60,7 +74,8 @@ namespace AccountService.GrpcServices
             return new CreateAccountReply
             {
                 Success = true,
-                Message = "Account Created Successfully!"
+                Message = "Account Created Successfully!",
+                MessageType = 3
             };
         }
 

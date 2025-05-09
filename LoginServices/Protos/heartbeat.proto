@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option csharp_namespace = "HeartBeatService.Grpc";
+
+package heartbeat;
+
+service HeartBeatService {
+  rpc SendHeartbeat (HeartbeatRequest) returns (HeartbeatReply);
+  rpc GetOnlineUsers (Empty) returns (OnlineUsersReply);
+}
+
+message HeartbeatRequest {
+  string username = 1;
+}
+
+message HeartbeatReply {
+  string message = 1;
+  bool online = 2;
+}
+
+message OnlineUsersReply {
+	repeated string usernames = 1;
+}
+
+message Empty {}

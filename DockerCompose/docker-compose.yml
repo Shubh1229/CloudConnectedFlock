@@ -7,6 +7,7 @@ services:
         image: postgres:15
         container_name: accounts-postgres-db
         restart: always
+        
         environment:
             POSTGRES_USER: shubh
             POSTGRES_PASSWORD: 8342AdksnAKe
@@ -19,6 +20,7 @@ services:
             - ccflocknet
 
     account-service:
+        
         build:
             context: ../AccountService
             dockerfile: Dockerfile
@@ -26,14 +28,17 @@ services:
             - "9000:9000"
         environment:
             - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=accountsdb;Username=shubh;Password=8342AdksnAKe
+            - Jwt__Key=7bATceklEQce5y28HMFU1YwYJcBna4Jz
         depends_on:
             - postgres
         networks:
             - ccflocknet
     
     login-service:
+        
         environment:
             - ASPNETCORE_ENVIRONMENT=Production
+            - Jwt__Key=7bATceklEQce5y28HMFU1YwYJcBna4Jz
         build:
             context: ../
             dockerfile: LoginServices/Dockerfile
@@ -42,8 +47,62 @@ services:
             - "5001:443"
         depends_on:
             - account-service
+            - heartbeat-service
         networks:
             - ccflocknet
+    
+    heartbeat-service:
+        environment:
+            - Jwt__Key=7bATceklEQce5y28HMFU1YwYJcBna4Jz
+        build:
+            context: ../
+            dockerfile: HeartBeatService/Dockerfile
+        ports:
+            - "9005:9005"
+        depends_on:
+            - redis
+        networks:
+            - ccflocknet
+    
+    hub-service:
+        build:
+            context: ../
+            dockerfile: HubService/Dockerfile
+        environment:
+            - Jwt__Key=7bATceklEQce5y28HMFU1YwYJcBna4Jz
+            - HeartbeatService__Address=http://heartbeat-service:9005
+        ports:
+            - "5002:80"
+            - "5003:443"
+        depends_on:
+            - login-service
+            - heartbeat-service
+        networks:
+            - ccflocknet
+
+    redis:
+        image: redis:7
+        container_name: online-users-redis-db
+        
+        ports:
+            - "6379:6379"
+        networks:
+            - ccflocknet
+    
+    nginx:
+        image: nginx:stable
+        ports:
+            - "80:80"
+        volumes:
+            - ../nginx/conf.d:/etc/nginx/conf.d:ro
+            - ../Frontend:/usr/share/nginx/html:ro
+        depends_on:
+            - login-service
+            - heartbeat-service
+            - account-service
+        networks:
+            - ccflocknet
+
 volumes:
     pgdata:
 
