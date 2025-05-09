@@ -115,7 +115,7 @@ Creates a new account.
 
 ## 📄 License
 
-Licensed under the [Apache 2.0 License](LICENSE).
+Licensed under the [Apache 2.0 License](License).
 
 ---
 
