@@ -74,6 +74,8 @@
     localStorage.removeItem("jwt");
     window.location.href = "/login/login.html";
   }
+  console.log("Token:", localStorage.getItem("jwt"));
+
 
   function getUsernameFromJwt(token) {
     try {
@@ -89,6 +91,8 @@
 
   async function sendHeartbeat() {
     const token = localStorage.getItem("jwt");
+    console.log("Token:", localStorage.getItem("jwt"));
+
     if (!token) return;
 
     try {
