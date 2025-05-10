@@ -1,5 +1,6 @@
 
 using HubService.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -64,19 +65,31 @@ namespace HubService
             {
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(jwtKey)),
+                    
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    
+                    ValidIssuer = "ccflock",
+                    ValidAudience = "ccflock-client",
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(jwtKey)),
+                    ClockSkew = TimeSpan.Zero
+
                 };
                 options.Events = new JwtBearerEvents
                 {
+                    OnMessageReceived = context =>
+                    {
+                        Console.WriteLine("Message Received: " + context.Token?.ToString());
+                        Console.WriteLine("Message Received: " + context.Token);
+                        return Task.CompletedTask;
+                    },
                     OnAuthenticationFailed = context =>
                     {
-                        Console.WriteLine("JWT AUTH FAILED: " + context.Exception?.Message);
+                        Console.WriteLine("AUTH FAILURE:");
+                        Console.WriteLine(context.Exception?.ToString());
+                        Console.WriteLine("Header was: " + context.Request.Headers["Authorization"]);
                         return Task.CompletedTask;
                     },
                     OnTokenValidated = context =>

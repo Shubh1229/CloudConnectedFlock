@@ -79,9 +79,11 @@ namespace LoginServices.Controllers
                 {
                     Subject = new ClaimsIdentity(new[]
                     {
-                        new Claim(JwtRegisteredClaimNames.Name, loginRequest.Username),
+                        new Claim(ClaimTypes.Name, loginRequest.Username),
                     }),
                     Expires = DateTime.UtcNow.AddHours(2),
+                    Issuer = "ccflock",
+                    Audience = "ccflock-client",
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                 };
 

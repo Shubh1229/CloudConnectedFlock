@@ -68,6 +68,8 @@
     <a href="register.html">Don't have an account? Create one</a>
 
     <script>
+
+        console.log("Updated this login.html file just now lets see the updates");
         document.getElementById('loginForm').addEventListener('submit', async function (e) {
             e.preventDefault();
             const username = document.getElementById('username').value;
@@ -92,7 +94,7 @@
 
             switch (result.result) {
                 case 4: // Success
-                    window.location.href = '/hub/hub.html';
+                    window.location.href = 'hub.html';
                     break;
                 case 3: // Invalid credentials
                     alert("Incorrect username or password.");
