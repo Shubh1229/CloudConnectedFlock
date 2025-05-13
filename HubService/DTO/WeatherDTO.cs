@@ -9,5 +9,7 @@ namespace HubService.DTO {
         public required string City {get; set;}
 
         public required string State {get; set;}
+
+        public required double Precip {get; set;}
     }
 }

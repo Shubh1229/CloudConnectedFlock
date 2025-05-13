@@ -19,4 +19,5 @@ message WeatherResponse {
   int64 weatherCode = 3;
   string city = 4;
   string state = 5;
+  double precipitation = 6;
 }

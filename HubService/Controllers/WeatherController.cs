@@ -31,7 +31,8 @@ namespace  HubService.Controllers {
                 Condition = response.ConditionSummary,
                 Code = response.WeatherCode,
                 City = response.City,
-                State = response.State
+                State = response.State,
+                Precip = response.Precipitation
             }; 
 
 
