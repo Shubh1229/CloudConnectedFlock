@@ -196,6 +196,47 @@
 
   setInterval(getWeather, 1800000); // 30 minutes
 </script>
+<script>
+  const conditionToVideo = {
+    "Overcast": "overcast.mov",
+    "Rain": "rainingclouds.mp4",
+    "Cloudy": "slightlycloudyskys.mp4",
+    "Snow": "snow.mov",
+    "Fog": "foggy.mov"
+  };
+
+  async function fetchWeatherAndShow() {
+    const fallback = { lat: 40.6084, lon: -75.4902 };
+
+    function getLocation() {
+      return new Promise((resolve) => {
+        if (!navigator.geolocation) return resolve(fallback);
+        navigator.geolocation.getCurrentPosition(
+          (pos) => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
+          () => resolve(fallback),
+          { timeout: 5000 }
+        );
+      });
+    }
+
+    const { lat, lon } = await getLocation();
+
+    try {
+      const res = await fetch(`/api/weather?lat=${lat}&lon=${lon}`);
+      const data = await res.json();
+      console.log("Weather data:", data);
+
+      const video = conditionToVideo[data.condition_summary] || "slightlycloudyskys.mp4";
+      document.getElementById("weather-video").src = `weather/${video}`;
+    } catch (err) {
+      console.error("Failed to load weather:", err);
+    }
+  }
+
+  fetchWeatherAndShow();
+</script>
+
+
 
 </body>
 </html>

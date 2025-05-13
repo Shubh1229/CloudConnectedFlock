@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeartBeatService", "HeartBe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HubService", "HubService\HubService.csproj", "{B1040E54-9097-4987-86E5-5159C9F96805}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherService", "WeatherService\WeatherService.csproj", "{34126F38-037B-4964-96D2-057C61280225}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{B1040E54-9097-4987-86E5-5159C9F96805}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1040E54-9097-4987-86E5-5159C9F96805}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1040E54-9097-4987-86E5-5159C9F96805}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34126F38-037B-4964-96D2-057C61280225}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34126F38-037B-4964-96D2-057C61280225}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34126F38-037B-4964-96D2-057C61280225}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34126F38-037B-4964-96D2-057C61280225}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
