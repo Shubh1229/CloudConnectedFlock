@@ -77,19 +77,6 @@
   console.log("Token:", localStorage.getItem("jwt"));
   console.log("Sending Authorization:", "Bearer " + localStorage.getItem("jwt"));
 
-  // function getUsernameFromJwt(token) {
-  //   try {
-  //     const payloadBase64 = token.split('.')[1];
-  //     const decoded = atob(payloadBase64);
-  //     const parsed = JSON.parse(decoded);
-  //     console.log(parsed["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"]);
-  //     return parsed["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
-  //   } catch (e) {
-  //     console.error("Invalid JWT:", e);
-  //     return null;
-  //   }
-  // }
-
   console.log("Create a new claims type");
 
   async function sendHeartbeat() {
@@ -158,6 +145,72 @@
   fetchOnlineUsers();
   console.log("Starting heartbeat and onlineuser functions");
   runHearbeatandGetOnlineUsers(sendHeartbeat, fetchOnlineUsers, 5000, 5000);
+</script>
+<script>
+
+  let fileLocation = "";
+  let longitude = -75.62646225289177;
+  let latitude = 40.54556729052694;
+
+  navigator.geolocation.getCurrentPosition(
+    // Success function
+            showPosition,
+            fallbackToDefault, 
+            // Options. See MDN for details.
+            {
+               enableHighAccuracy: true,
+               timeout: 5000,
+               maximumAge: 0
+            }
+  );
+
+
+
+  function showPosition(position) {
+    longitude = position.coords.longitude;
+    latitude = position.coords.latitude;
+    getWeather();
+  }
+  function fallbackToDefault(error) {
+    console.warn("Geolocation failed or denied, using default location:", error.message);
+    getWeather(); // Still call using default coords
+  }
+
+  async function getWeather() {
+    
+    const response = await fetch("/api/getweather", {
+      method: POST,
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+          logitude: longitude,
+          latitude: latitude
+      })
+  });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Weather:", data.weather);
+      fileLocation = data.fileLocation;
+      // optionally display: data.weather.temp, etc.
+    } else {
+      console.error("Failed to fetch weather");
+    }
+
+  }
+
+  
+
+  setInterval( () => 
+  {
+    getWeather();
+  }, 1800000 // is this 30 minutes?
+  );
+
+
+
+
 </script>
 
 </body>
