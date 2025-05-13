@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <Protobuf Include="Protos\heartbeat.proto" GrpcServices="Client" />
+    <Protobuf Include="Protos\weather.proto" GrpcServices="Client" />
   </ItemGroup>
 
 </Project>

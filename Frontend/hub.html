@@ -49,6 +49,10 @@
       border-radius: 50%;
       margin-right: 10px;
     }
+    #weather-box {
+      margin: 120px auto 0 auto;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -69,52 +73,39 @@
   <div id="user-list">Loading...</div>
 </div>
 
+<div id="weather-box">
+  <h2 id="weather-summary">Loading weather...</h2>
+  <p>🌡 Temp: <span id="weather-temp">--</span> °F</p>
+  <p>🌧 Precipitation: <span id="weather-precip">--</span>%</p>
+  <p>📍 Location: <span id="weather-location">Detecting...</span></p>
+</div>
+
 <script>
   function logout() {
     localStorage.removeItem("jwt");
     window.location.href = "login.html";
   }
-  console.log("Token:", localStorage.getItem("jwt"));
-  console.log("Sending Authorization:", "Bearer " + localStorage.getItem("jwt"));
-
-  // function getUsernameFromJwt(token) {
-  //   try {
-  //     const payloadBase64 = token.split('.')[1];
-  //     const decoded = atob(payloadBase64);
-  //     const parsed = JSON.parse(decoded);
-  //     console.log(parsed["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"]);
-  //     return parsed["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
-  //   } catch (e) {
-  //     console.error("Invalid JWT:", e);
-  //     return null;
-  //   }
-  // }
-
-  console.log("Create a new claims type");
 
   async function sendHeartbeat() {
     const token = localStorage.getItem("jwt");
-    console.log("Token from sendhearbeat function:", localStorage.getItem("jwt"));
-    console.log("Sending Authorization from heartbeat function:", "Bearer " + localStorage.getItem("jwt"));
-
-    if (!token || token.split('.').length != 3) {
-      console.warn("JWT missing or malformed. Skipping hearbeat...");
-      console.warn("Token: " + localStorage.getItem("jwt"));
+    if (!token || token.split('.').length !== 3) {
+      console.warn("JWT missing or malformed. Skipping heartbeat...");
       return;
     }
+
     try {
       const response = await fetch("/api/heartbeat", {
         method: "POST",
         headers: {
-            "Authorization": "Bearer " + localStorage.getItem("jwt")
+          "Authorization": "Bearer " + token
         }
       });
       if (!response.ok) {
-      console.error("Heartbeat failed with status:", response.status);
-      return;
+        console.error("Heartbeat failed with status:", response.status);
+        return;
       }
       const result = await response.json();
-      console.log("Heartbeat response: ", result);
+      console.log("Heartbeat response:", result);
     } catch (err) {
       console.error("Heartbeat failed:", err);
     }
@@ -139,25 +130,71 @@
     }
   }
 
-  function runHearbeatandGetOnlineUsers( heartbeat, onlineusers, intervalhb, intervalou) {
-    console.log("sending hearbeat...");
-    setInterval( () => {
-      heartbeat();
-    }, intervalhb);
-
-    console.log("heartbeat sent!\nsending fetch all online users...");
-
-    setInterval( () => {
-      onlineusers();
-    }, intervalou);
-
-    console.log("online users sent!")
+  function runHeartbeatAndGetOnlineUsers(heartbeat, onlineusers, intervalhb, intervalou) {
+    setInterval(heartbeat, intervalhb);
+    setInterval(onlineusers, intervalou);
   }
 
   // Kick it all off
   fetchOnlineUsers();
-  console.log("Starting heartbeat and onlineuser functions");
-  runHearbeatandGetOnlineUsers(sendHeartbeat, fetchOnlineUsers, 5000, 5000);
+  runHeartbeatAndGetOnlineUsers(sendHeartbeat, fetchOnlineUsers, 5000, 5000);
+</script>
+
+<script>
+  let fileLocation = "";
+  let longitude = -75.62646225289177;
+  let latitude = 40.54556729052694;
+
+  navigator.geolocation.getCurrentPosition(
+    showPosition,
+    fallbackToDefault,
+    {
+      enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 0
+    }
+  );
+
+  function showPosition(position) {
+    longitude = position.coords.longitude;
+    latitude = position.coords.latitude;
+    getWeather();
+  }
+
+  function fallbackToDefault(error) {
+    console.warn("Geolocation failed or denied, using default location:", error.message);
+    getWeather(); // Still call using default coords
+  }
+
+  async function getWeather() {
+    const response = await fetch("/api/getweather", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        longitude: longitude,
+        latitude: latitude
+      })
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const weather = data.weather;
+      fileLocation = data.fileLocation;
+
+      const tempF = (weather.temp * 9/5 + 32).toFixed(1);
+
+      document.getElementById("weather-summary").innerText = weather.condition;
+      document.getElementById("weather-temp").innerText = tempF;
+      document.getElementById("weather-precip").innerText = "--"; // add later
+      document.getElementById("weather-location").innerText = weather.city + ", " + weather.state; // placeholder
+    } else {
+      console.error("Failed to fetch weather");
+    }
+  }
+
+  setInterval(getWeather, 1800000); // 30 minutes
 </script>
 
 </body>
