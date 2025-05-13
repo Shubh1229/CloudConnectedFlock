@@ -5,6 +5,7 @@ version: '3.8'
 services:
     postgres:
         image: postgres:15
+        platform: linux/amd64
         container_name: accounts-postgres-db
         restart: always
         
@@ -20,7 +21,7 @@ services:
             - ccflocknet
 
     account-service:
-        
+        platform: linux/amd64
         build:
             context: ../AccountService
             dockerfile: Dockerfile
@@ -35,7 +36,7 @@ services:
             - ccflocknet
     
     login-service:
-        
+        platform: linux/amd64
         environment:
             - ASPNETCORE_ENVIRONMENT=Production
             - Jwt__Key=7bATceklEQce5y28HMFU1YwYJcBna4Jz
@@ -43,8 +44,8 @@ services:
             context: ../
             dockerfile: LoginServices/Dockerfile
         ports:
-            - "5000:80"
-            - "5001:443"
+            - "5001:80"
+            - "5002:443"
         depends_on:
             - account-service
             - heartbeat-service
@@ -52,6 +53,7 @@ services:
             - ccflocknet
     
     heartbeat-service:
+        platform: linux/amd64
         environment:
             - Jwt__Key=7bATceklEQce5y28HMFU1YwYJcBna4Jz
         build:
@@ -65,6 +67,7 @@ services:
             - ccflocknet
     
     hub-service:
+        platform: linux/amd64
         build:
             context: ../
             dockerfile: HubService/Dockerfile
@@ -72,8 +75,8 @@ services:
             - Jwt__Key=7bATceklEQce5y28HMFU1YwYJcBna4Jz
             - HeartbeatService__Address=http://heartbeat-service:9005
         ports:
-            - "5002:80"
-            - "5003:443"
+            - "5003:80"
+            - "5004:443"
         depends_on:
             - login-service
             - heartbeat-service
@@ -82,6 +85,7 @@ services:
 
     redis:
         image: redis:7
+        platform: linux/amd64
         container_name: online-users-redis-db
         
         ports:
@@ -90,15 +94,17 @@ services:
             - ccflocknet
 
     weather-service:
-            build:
-                context: ../
-                dockerfile: WeatherService/Dockerfile
-            ports:
-                - "9002:9002"
-            networks:
-                - ccflocknet
+        platform: linux/amd64
+        build:
+            context: ../
+            dockerfile: WeatherService/Dockerfile
+        ports:
+            - "9002:9002"
+        networks:
+            - ccflocknet
     nginx:
         image: nginx:stable
+        platform: linux/amd64
         ports:
             - "80:80"
             - "443:443"
