@@ -88,14 +88,24 @@ services:
             - "6379:6379"
         networks:
             - ccflocknet
-    
+
+    weather-service:
+            build:
+                context: ../
+                dockerfile: WeatherService/Dockerfile
+            ports:
+                - "9002:9002"
+            networks:
+                - ccflocknet
     nginx:
         image: nginx:stable
         ports:
             - "80:80"
+            - "443:443"
         volumes:
             - ../nginx/conf.d:/etc/nginx/conf.d:ro
             - ../Frontend:/usr/share/nginx/html:ro
+            - ../nginx/certs:/etc/nginx/certs:ro
         depends_on:
             - login-service
             - heartbeat-service

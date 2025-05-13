@@ -82,10 +82,12 @@ namespace LoginServices.Controllers
                         new Claim(ClaimTypes.Name, loginRequest.Username),
                     }),
                     Expires = DateTime.UtcNow.AddHours(2),
+                    Issuer = "ccflock",
+                    Audience = "ccflock-client",
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                 };
 
-                var token = tokenHandler.CreateJwtSecurityToken(tokenDescriptor);
+                var token = tokenHandler.CreateToken(tokenDescriptor);
                 logger.LogInformation("Created JWT Security Token ...");
                 var tokenString = tokenHandler.WriteToken(token);
 

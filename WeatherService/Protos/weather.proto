@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+option csharp_namespace = "WeatherService";
+
+package weather;
+
+service WeatherService {
+  rpc GetForecast (WeatherRequest) returns (WeatherResponse);
+}
+
+message WeatherRequest {
+  double latitude = 1;
+  double longitude = 2;
+}
+
+message WeatherResponse {
+  double temperature_c = 1;
+  string conditionSummary = 2;
+  int64 weatherCode = 3;
+  string city = 4;
+  string state = 5;
+  double precipitation = 6;
+}

@@ -2,23 +2,26 @@
 
 ## Overview
 
-This project is a microservice-based backend system built with **.NET 7**, designed to handle **user account registration** and **login** using **gRPC communication** between services. It's suitable for cloud deployment and serves as the foundational authentication layer of a larger distributed system.
+Cloud Connected Flock is a microservice-based backend system built with **.NET 8**, designed for **user account registration**, **login**, and **online presence tracking** using **gRPC communication** and **Redis-backed heartbeats**. It serves as the foundational authentication and status layer of a distributed application and is suitable for cloud deployment.
 
-The solution includes:
+The system includes:
 
-- `AccountService` — gRPC service for creating and retrieving user accounts.
-- `LoginServices` — HTTP REST API for login and registration, acting as a gRPC client to `AccountService`.
+- `AccountService`: gRPC service for account creation and credential validation.
+- `LoginServices`: REST API for user login and registration, connecting to `AccountService` via gRPC.
+- `HeartBeatService`: gRPC and Redis-powered microservice that stores and tracks online user presence.
+- `HubService`: Lightweight hub exposing the list of online users via real-time protocols like MQTT/WebSockets.
+- `NGINX`: Acts as a reverse proxy to expose services securely.
 
 ---
 
 ## 🚀 Features
 
-- 🔐 **Account Creation** with username, password, email, and birthday.
-- 🔑 **Secure Password Hashing** using HMAC-SHA512.
-- ✅ **Login Validation** via gRPC calls to the Account service.
-- 📦 **PostgreSQL** database for account persistence.
-- 🐳 **Docker Compose** setup for easy development and deployment.
-- 🌐 **gRPC Communication** for fast, efficient service-to-service interaction.
+- 🔐 Account creation with secure password storage (HMACSHA512).
+- ✅ Login verification using gRPC and protobuf models.
+- 🧠 Heartbeat tracking for active/online users using Redis.
+- 📋 Online user visibility via HubService.
+- 🌍 Centralized HTTP access through NGINX reverse proxy.
+- 🐳 Docker Compose environment for development and deployment.
 
 ---
 
@@ -27,31 +30,26 @@ The solution includes:
 ```plaintext
 .
 ├── AccountService/
-│   ├── Controllers/
-│   ├── GrpcServices/
-│   ├── Security/
-│   ├── Data/
-│   ├── Protos/               # gRPC definitions
-│   └── Dockerfile
 ├── LoginServices/
-│   ├── Controllers/
-│   ├── DTOs/
-│   └── Dockerfile
+├── HeartBeatService/
+├── HubService/
+├── nginx/
+│   └── conf.d/
 ├── docker-compose.yml
+├── appsettings.json
 └── CloudConnectedFlockSolution.sln
 ```
 
 ---
 
-## 🛠️ Technologies Used
+## 🛠️ Tech Stack
 
-- **.NET 7**
-- **gRPC**
-- **ASP.NET Core**
-- **PostgreSQL**
+- **.NET 8**, **ASP.NET Core**
+- **gRPC** for microservice communication
+- **Redis** for status tracking
+- **PostgreSQL** via Entity Framework Core
 - **Docker & Docker Compose**
-- **Entity Framework Core**
-- **HMAC-SHA512** for password hashing
+- **NGINX** for reverse proxy and SSL termination
 
 ---
 
@@ -59,41 +57,47 @@ The solution includes:
 
 ### 🔧 Prerequisites
 
-- [.NET 7 SDK](https://dotnet.microsoft.com/download)
+- [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop)
 
-### 📦 Run with Docker Compose
+### ▶️ Start with Docker Compose
 
 ```bash
 docker-compose up --build
 ```
 
-This will:
-- Spin up a PostgreSQL container
-- Build and run the AccountService (on port `9000`)
-- Build and run the LoginServices (on port `5000` HTTP, `5001` HTTPS)
+This will launch:
+
+- PostgreSQL on `5432`
+- AccountService on `9000` (gRPC)
+- LoginService on `5000` (HTTP) and `5001` (HTTPS)
+- HeartBeatService with Redis integration
+- HubService for displaying online users
+- NGINX on port `80` or `443` as configured
 
 ---
 
-## 🎯 API Endpoints
+## 🎯 REST API Endpoints
 
 ### `POST /login`
-Authenticates a user via gRPC and returns an appropriate response.
+
+Authenticates user credentials via gRPC.
 
 ```json
 {
-  "username": "user123",
-  "password": "mypassword"
+  "username": "exampleUser",
+  "password": "securePass123"
 }
 ```
 
 ### `POST /register`
-Registers a new user.
+
+Creates a new account.
 
 ```json
 {
-  "username": "user123",
-  "password": "mypassword",
+  "username": "newuser",
+  "password": "newpass",
   "email": "user@example.com",
   "birthday": "2000-01-01"
 }
@@ -103,29 +107,30 @@ Registers a new user.
 
 ## 🔐 Security
 
-- Passwords are never stored in plain text.
-- Each password is hashed using a unique key (HMACSHA512).
-- gRPC is used for secure, efficient communication between internal services.
+- Passwords hashed using HMACSHA512 and salted with per-user keys.
+- Sensitive operations use gRPC over internal ports.
+- NGINX enforces HTTPS externally.
 
 ---
 
 ## 📄 License
 
-This project is licensed under the [Apache 2.0 License](License).
+Licensed under the [Apache 2.0 License](License).
 
 ---
 
 ## 👨‍💻 Author
 
-Arihant Singh  
+**Arihant Singh**  
 M.S. Computer Science, Franklin University  
-Passionate about cloud-native development, distributed systems, and secure backend services.
+Passionate about secure, cloud-native, distributed applications.
 
 ---
 
-## 🏗️ Future Improvements
+## 🛣️ Roadmap
 
-- Add **2FA** via email (Mailjet integration).
-- Implement **JWT tokens** for login sessions.
-- Introduce **RabbitMQ** or **MassTransit** for messaging between microservices.
-- Add support for **Kubernetes** deployment.
+- 🪪 Implement JWT-based session auth.
+- 📬 Integrate Mailjet for 2FA and notifications.
+- 📊 Web UI with real-time online/offline updates.
+- ☸️ Full Kubernetes manifests for production deployment.
+
