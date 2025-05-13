@@ -17,4 +17,6 @@ message WeatherResponse {
   double temperature_c = 1;
   string conditionSummary = 2;
   int64 weatherCode = 3;
+  string city = 4;
+  string state = 5;
 }

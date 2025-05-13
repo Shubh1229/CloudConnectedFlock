@@ -29,7 +29,9 @@ namespace  HubService.Controllers {
             var weather = new WeatherDTO{
                 Temp = response.TemperatureC,
                 Condition = response.ConditionSummary,
-                Code = response.WeatherCode
+                Code = response.WeatherCode,
+                City = response.City,
+                State = response.State
             }; 
 
 
