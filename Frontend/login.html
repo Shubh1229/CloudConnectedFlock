@@ -61,11 +61,29 @@
     <img src="logo/CCFlock%20Logo.png" alt="Cloud Connected Flock Logo" />
     <h1>Cloud Connected Flock</h1>
     <form id="loginForm">
+        <label for="username">Username</label>
         <input type="text" id="username" placeholder="Username" required />
+        <label for="password">Password</label>
         <input type="password" id="password" placeholder="Password" required />
         <button type="submit">Login</button>
     </form>
     <a href="register.html">Don't have an account? Create one</a>
+        <div id="toast" style="
+        visibility: hidden;
+        min-width: 200px;
+        margin-left: -100px;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        border-radius: 2px;
+        padding: 16px;
+        position: fixed;
+        z-index: 1;
+        left: 50%;
+        bottom: 30px;
+        font-size: 17px;
+        ">
+    </div>
 
     <script>
 
@@ -92,22 +110,36 @@
                 localStorage.setItem('jwt', result.token); // ✅ save token
             }
 
+            function showToast(message, isError = false) {
+                const toast = document.getElementById("toast");
+                toast.style.backgroundColor = isError ? "#cc0000" : "#333";
+                toast.textContent = message;
+                toast.style.visibility = "visible";
+
+                setTimeout(() => {
+                    toast.style.visibility = "hidden";
+                }, 3000);
+            }
+
             switch (result.result) {
                 case 4: // Success
-                    window.location.href = 'hub.html';
+                    showToast("Successful Login!", false);
+                    setTimeout(() => {
+                        window.location.href = 'hub.html';
+                    }, 1000);
                     break;
                 case 3: // Invalid credentials
-                    alert("Incorrect username or password.");
+                    showToast("Incorrect Username or Password...", true);
                     break;
                 case 1: // User not found
-                    alert("User not found.");
+                    showToast("User Not Found...", true);
                     break;
                 default:
                     alert(result.message || "An error occurred.");
                     break;
             }
         });
-    </script> 
+    </script>
 </body>
 </html>
 
