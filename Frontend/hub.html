@@ -78,6 +78,10 @@
   <p>🌡 Temp: <span id="weather-temp">--</span> °F</p>
   <p>🌧 Precipitation: <span id="weather-precip">--</span>%</p>
   <p>📍 Location: <span id="weather-location">Detecting...</span></p>
+  <video id="weather-video" width="640" height="360" autoplay loop muted>
+  <source id="weather-video-source" src="" type="">
+  Your browser does not support the video tag.
+  </video>
 </div>
 
 <script>
@@ -159,6 +163,7 @@
         function showPosition(position) {
             longitude = position.coords.longitude;
             latitude = position.coords.latitude;
+            console.log("Got User Location: Longitude: " + longitude + " and Latitude: " + latitude );
             getWeather();
         }
 
@@ -168,6 +173,7 @@
         }
 
         async function getWeather() {
+          console.log("Sending POST Request to getweather");
         const response = await fetch("/api/getweather", {
             method: "POST",
             headers: {
@@ -178,24 +184,33 @@
             latitude: latitude
             })
         });
+        
 
         if (response.ok) {
             const data = await response.json();
             const weather = data.weather;
+            console.log("Got response ", data);
             fileLocation = data.fileLocation;
 
             const tempF = (weather.temp * 9/5 + 32).toFixed(1);
 
+            console.log(fileLocation);
+
             document.getElementById("weather-summary").innerText = weather.condition;
             document.getElementById("weather-temp").innerText = tempF;
-            document.getElementById("weather-precip").innerText = "--"; // add later
-            ocument.getElementById("weather-location").innerText = weather.city + ", " + weather.state; // placeholder
+            document.getElementById("weather-precip").innerText = weather.precip; // add later
+            document.getElementById("weather-location").innerText = weather.city + ", " + weather.state; // placeholder
+            document.getElementById("weather-video-source").src = fileLocation;
+            document.getElementById("weather-video").load();
+            document.getElementById("weather-video-source").type = "video/mp4";
+            console.log("using type \"video/mp4\"");
         } else {
             console.error("Failed to fetch weather");
         }
     }
 
-  setInterval(getWeather, 1800000); // 30 minutes
+  //setInterval(getWeather, 1800000); // 30 minutes
+  setInterval(getWeather, 600000); // 10 minutes
 </script>
 
 </body>

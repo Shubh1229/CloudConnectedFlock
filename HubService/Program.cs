@@ -48,6 +48,7 @@ namespace HubService
                 });
             });
             builder.Services.AddSingleton<GrpcHeartbeatClient>();
+            builder.Services.AddSingleton<GrpcWeatherClient>();
             //builder.Services.AddSingleton<MqttClientService>();
 
             builder.WebHost.ConfigureKestrel(options =>
