@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>404 - Not Found</title>
+  <link rel="icon" type="image/png" href="logo/CCFlock%20Logo.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background-color: #0b1e3f;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      background-color: #142b5c;
+      padding: 15px;
+    }
+
+    header span {
+      font-size: 1.2em;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    header img {
+      height: 24px;
+      width: 24px;
+      margin-right: 10px;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    main img {
+      max-width: 180px;
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 18px;
+    }
+
+    a {
+      color: #66ccff;
+      text-decoration: underline;
+    }
+
+    footer {
+      background-color: #142b5c;
+      border-top: 1px solid white;
+      width: 100%;
+      padding: 15px 0;
+      text-align: center;
+    }
+
+    .footer-inner a {
+      color: white;
+      text-decoration: underline;
+      margin: 0 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <span onclick="goHome()">
+      <img src="logo/CCFlock%20Logo.png" alt="Logo" />
+      Cloud Connected Flock
+    </span>
+  </header>
+
+  <main>
+    <img src="logo/CCFlock%20Logo.png" alt="Cloud Connected Flock Logo" />
+    <h1>404</h1>
+    <p>Oops! That page doesn't exist.</p>
+    <p><a href="/login">Go back to login</a></p>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <a href="/about">About this Website</a> | <a href="/license">License</a>
+    </div>
+  </footer>
+
+  <script>
+    function goHome() {
+      const jwt = localStorage.getItem("jwt");
+      if (jwt && jwt.split('.').length === 3) {
+        window.location.href = "hub.html";
+      } else {
+        window.location.href = "login.html";
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,11 +1,16 @@
 syntax = "proto3";
 
-option csharp_namespace = "AccountServer.Grpc";
+option csharp_namespace = "AccountService.Grpc";
 package account;
 
 service AccountService {
   rpc CreateAccount (CreateAccountRequest) returns (CreateAccountReply);
   rpc GetAccount (GetAccountRequest) returns (ReturnAccountReply);
+  rpc UpdateUsername (UpdateUsernameRequest) returns (SuccessfulChangeReply);
+  rpc UpdatePassword (UpdatePasswordRequest) returns (SuccessfulChangeReply);
+  rpc UpdateEmail (UpdateEmailRequest) returns (SuccessfulChangeReply);
+  rpc UpdateBirthday (UpdateBirthdayRequest) returns (SuccessfulChangeReply);
+  rpc UpdateAccount (UpdateAccountRequest) returns (SuccessfulChangeReply);
 }
 
 message CreateAccountRequest {
@@ -23,11 +28,38 @@ message CreateAccountReply {
 
 message GetAccountRequest {
 	string username = 1;
-	string password = 3;
+	string password = 2;
 }
 
 message ReturnAccountReply {
 	string message = 1;
 	bool correctAccountCredentials = 2;
 	int64 messageType = 3;
+}
+
+message UpdateUsernameRequest {
+  string username = 1;
+}
+
+message SuccessfulChangeReply {
+  bool success = 1;
+}
+
+message UpdatePasswordRequest {
+  string password = 1;
+}
+
+message UpdateBirthdayRequest {
+  string birthday = 1;
+}
+
+message UpdateEmailRequest {
+  string email = 1;
+}
+
+message UpdateAccountRequest {
+  string username = 1;
+  string email = 2;
+  string password = 3;
+  string birthday = 4;
 }

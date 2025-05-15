@@ -12,13 +12,28 @@
       background-color: #0b1e3f;
       color: white;
     }
+
     header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px;
-      background-color: #142b5c;
+    display: flex;
+    align-items: center;
+    background-color: #142b5c;
+    padding: 15px;
     }
+
+    header span {
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    }
+
+    header img {
+    height: 24px;
+    width: 24px;
+    margin-right: 10px;
+    }
+
     header a, button {
       color: white;
       background: none;
@@ -28,6 +43,7 @@
       margin-left: 20px;
       text-decoration: underline;
     }
+
     #online-box {
       position: absolute;
       top: 70px;
@@ -37,11 +53,13 @@
       border-radius: 8px;
       width: 200px;
     }
+
     .user {
       display: flex;
       align-items: center;
       margin-bottom: 10px;
     }
+
     .dot {
       height: 10px;
       width: 10px;
@@ -49,18 +67,47 @@
       border-radius: 50%;
       margin-right: 10px;
     }
+
     #weather-box {
       margin: 120px auto 0 auto;
       text-align: center;
+    }
+    
+    #weather-video {
+      pointer-events: auto; /* allow mouse events like click */
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+
+    footer {
+      background-color: #142b5c;
+      border-top: 1px solid white;
+      width: 100%;
+      padding: 15px 0;
+      margin-top: 50px;
+    }
+
+    .footer-inner {
+      max-width: 800px;
+      margin: auto;
+      text-align: center;
+    }
+
+    .footer-inner a {
+      color: white;
+      text-decoration: underline;
+      margin: 0 10px;
     }
   </style>
 </head>
 <body>
 
 <header>
-  <div>
-    <strong>Cloud Connected Flock</strong>
-  </div>
+    <span onclick="goHome()">
+        <img src="logo/CCFlock%20Logo.png" alt="Logo" />
+        Cloud Connected Flock
+    </span>
   <div>
     <a href="/profile.html">My Profile</a>
     <a href="/groupchat.html">Group Chat</a>
@@ -78,16 +125,31 @@
   <p>🌡 Temp: <span id="weather-temp">--</span> °F</p>
   <p>🌧 Precipitation: <span id="weather-precip">--</span>%</p>
   <p>📍 Location: <span id="weather-location">Detecting...</span></p>
-  <video id="weather-video" width="640" height="360" autoplay loop muted>
-  <source id="weather-video-source" src="" type="">
-  Your browser does not support the video tag.
+  <video id="weather-video" width="640" height="360" autoplay loop muted playsinline>
+    <source id="weather-video-source" src="" type="">
+    Your browser does not support the video tag.
   </video>
 </div>
+
+<footer>
+  <div class="footer-inner">
+    <a href="/about.html">About this Website</a> | <a href="/license.html">License</a>
+  </div>
+</footer>
 
 <script>
   function logout() {
     localStorage.removeItem("jwt");
     window.location.href = "login.html";
+  }
+
+  function goHome() {
+    const jwt = localStorage.getItem("jwt");
+    if (jwt && jwt.split('.').length === 3) {
+      window.location.href = "hub.html";
+    } else {
+      window.location.href = "login.html";
+    }
   }
 
   async function sendHeartbeat() {
@@ -140,78 +202,87 @@
     setInterval(onlineusers, intervalou);
   }
 
-  // Kick it all off
-  fetchOnlineUsers();
-  runHeartbeatAndGetOnlineUsers(sendHeartbeat, fetchOnlineUsers, 5000, 5000);
+  window.addEventListener("DOMContentLoaded", () => {
+    if (localStorage.getItem("jwt") == null) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    fetchOnlineUsers();
+    runHeartbeatAndGetOnlineUsers(sendHeartbeat, fetchOnlineUsers, 5000, 5000);
+  });
 </script>
 
 <script>
-        let fileLocation = "";
-        let longitude = -75.62646225289177;
-        let latitude = 40.54556729052694;
+  let fileLocation = "";
+  let longitude = -75.62646225289177;
+  let latitude = 40.54556729052694;
 
-        navigator.geolocation.getCurrentPosition(
-        showPosition,
-        fallbackToDefault,
-        {
-            enableHighAccuracy: true,
-            timeout: 5000,
-            maximumAge: 0
-        }
-        );
-
-        function showPosition(position) {
-            longitude = position.coords.longitude;
-            latitude = position.coords.latitude;
-            console.log("Got User Location: Longitude: " + longitude + " and Latitude: " + latitude );
-            getWeather();
-        }
-
-        function fallbackToDefault(error) {
-            console.warn("Geolocation failed or denied, using default location:", error.message);
-            getWeather(); // Still call using default coords
-        }
-
-        async function getWeather() {
-          console.log("Sending POST Request to getweather");
-        const response = await fetch("/api/getweather", {
-            method: "POST",
-            headers: {
-            "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-            longitude: longitude,
-            latitude: latitude
-            })
-        });
-        
-
-        if (response.ok) {
-            const data = await response.json();
-            const weather = data.weather;
-            console.log("Got response ", data);
-            fileLocation = data.fileLocation;
-
-            const tempF = (weather.temp * 9/5 + 32).toFixed(1);
-
-            console.log(fileLocation);
-
-            document.getElementById("weather-summary").innerText = weather.condition;
-            document.getElementById("weather-temp").innerText = tempF;
-            document.getElementById("weather-precip").innerText = weather.precip; // add later
-            document.getElementById("weather-location").innerText = weather.city + ", " + weather.state; // placeholder
-            document.getElementById("weather-video-source").src = fileLocation;
-            document.getElementById("weather-video").load();
-            document.getElementById("weather-video-source").type = "video/mp4";
-            console.log("using type \"video/mp4\"");
-        } else {
-            console.error("Failed to fetch weather");
-        }
+  navigator.geolocation.getCurrentPosition(
+    showPosition,
+    fallbackToDefault,
+    {
+      enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 0
     }
+  );
 
-  //setInterval(getWeather, 1800000); // 30 minutes
+  function showPosition(position) {
+    longitude = position.coords.longitude;
+    latitude = position.coords.latitude;
+    console.log("Got User Location: Longitude: " + longitude + " and Latitude: " + latitude);
+    getWeather();
+  }
+
+  function fallbackToDefault(error) {
+    console.warn("Geolocation failed or denied, using default location:", error.message);
+    getWeather();
+  }
+
+  async function getWeather() {
+    console.log("Sending POST Request to getweather");
+    const response = await fetch("/api/getweather", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        longitude: longitude,
+        latitude: latitude
+      })
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const weather = data.weather;
+      fileLocation = data.fileLocation;
+
+      const tempF = (weather.temp * 9 / 5 + 32).toFixed(1);
+
+      document.getElementById("weather-summary").innerText = weather.condition;
+      document.getElementById("weather-temp").innerText = tempF;
+      document.getElementById("weather-precip").innerText = weather.precip;
+      document.getElementById("weather-location").innerText = weather.city + ", " + weather.state;
+      document.getElementById("weather-video-source").src = fileLocation;
+      document.getElementById("weather-video").load();
+      document.getElementById("weather-video-source").type = "video/mp4";
+    } else {
+      console.error("Failed to fetch weather");
+    }
+  }
+
   setInterval(getWeather, 600000); // 10 minutes
 </script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const video = document.getElementById('weather-video');
+    if (video) {
+      video.addEventListener('contextmenu', e => e.preventDefault());
+    }
+  });
+</script>
+
 
 </body>
 </html>

@@ -1,4 +1,4 @@
-﻿using AccountServer.Grpc;
+﻿using AccountService.Grpc;
 using HeartBeatService.Grpc;
 using Grpc.Net.Client;
 using LoginServices.DTOs;
@@ -17,7 +17,7 @@ namespace LoginServices.Controllers
         
         private static readonly GrpcChannel channel = GrpcChannel.ForAddress("http://account-service:9000");
         
-        private static readonly AccountService.AccountServiceClient client = new AccountService.AccountServiceClient(channel);
+        private static readonly AccountService.Grpc.AccountService.AccountServiceClient client = new AccountService.Grpc.AccountService.AccountServiceClient(channel);
 
         private static readonly GrpcChannel heartbeatChannel = GrpcChannel.ForAddress("http://heartbeat-service:9005");
 
@@ -105,7 +105,7 @@ namespace LoginServices.Controllers
         public async Task<IActionResult> Register([FromBody] AccountRegistration request)
         {
             
-            var client = new AccountService.AccountServiceClient(channel);
+            var client = new AccountService.Grpc.AccountService.AccountServiceClient(channel);
 
             logger.LogInformation("Sending GetUserRequest Waiting for Reply...");
             var reply = await client.CreateAccountAsync( new CreateAccountRequest{

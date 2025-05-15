@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>About - Cloud Connected Flock</title>
+  <link rel="icon" type="image/png" href="logo/CCFlock%20Logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      background-color: #0b1e3f;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+
+    header {
+    display: flex;
+    align-items: center;
+    background-color: #142b5c;
+    padding: 15px;
+    }
+
+    header span {
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    }
+
+    header img {
+    height: 24px;
+    width: 24px;
+    margin-right: 10px;
+    }
+
+    main {
+      flex: 1;
+      padding: 40px 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    h1, h2 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    p, ul {
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    a {
+      color: #66ccff;
+    }
+
+    strong {
+      color: #fff;
+    }
+
+    footer {
+      background-color: #142b5c;
+      border-top: 1px solid white;
+      width: 100%;
+      padding: 15px 0;
+    }
+
+    .footer-inner {
+      max-width: 900px;
+      margin: auto;
+      text-align: center;
+    }
+
+    .footer-inner a {
+      color: white;
+      text-decoration: underline;
+      margin: 0 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <span onclick="goHome()">
+        <img src="logo/CCFlock%20Logo.png" alt="Logo" />
+        Cloud Connected Flock
+    </span>
+  </header>
+
+  <main>
+    <h1>About Cloud Connected Flock</h1>
+
+    <p><strong>Cloud Connected Flock (CCFlock)</strong> is a free, secure, full-stack web platform built to showcase my skills in .NET 8.0 and C#, and to demonstrate my passion for backend development. This is a personal, portfolio, and future production-ready project that I created not only for fun, but to run my own server that anyone in the world can use.</p>
+
+    <p>All the source code is <strong>open source</strong> and licensed under Apache 2.0. You can view or clone the full repository on <a href="https://github.com/Shubh1229/CloudConnectedFlock" target="_blank">GitHub here</a>. Feel free to use the code as a reference or inspiration for your own learning and projects.</p>
+
+    <h2>What You Can Do</h2>
+    <ul>
+      <li>Register an account via <code>ccflock.duckdns.org/login.html</code> → then click "Create Account".</li>
+      <li>Passwords are hashed using HMAC 256-bit and are never stored in plaintext.</li>
+      <li>Accounts are stored in a PostgreSQL database that is backed up every night at 2am.</li>
+      <li>Upon logging in, you’ll be forwarded to the Hub Service which:
+        <ul>
+          <li>Greets you with live weather based on your shared location</li>
+          <li>Displays a weather-themed video</li>
+          <li>Lets you access your profile, the site-wide group chat, or logout securely</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h2>Tech Stack</h2>
+    <p>This is a microservices-based architecture built with:</p>
+    <ul>
+      <li>C# and .NET 8.0</li>
+      <li>gRPC for interservice communication</li>
+      <li>PostgreSQL (with nightly backups)</li>
+      <li>Redis for temporary state and future 2FA support</li>
+      <li>Docker for containerization</li>
+      <li>NGINX with HTTPS (Let's Encrypt) for secure reverse proxy</li>
+      <li>All hosted on my own server (Ubuntu, self-maintained)</li>
+    </ul>
+
+    <h2>Planned Features</h2>
+    <ul>
+      <li>Private messaging (with email alerts for offline users)</li>
+      <li>Customizable user profiles and avatars</li>
+      <li>A site-wide group chat with long-term message visibility</li>
+      <li>Resume and portfolio uploads</li>
+      <li>A Reddit-style forum service</li>
+      <li>...and more based on community feedback!</li>
+    </ul>
+
+    <p>If you have ideas for the platform, feel free to email me at <strong>shubh610@gmail.com</strong> or text me at <strong>484-695-8850</strong> with the subject line: <code>CCFlock Idea - [Your Name]</code>.</p>
+
+    <h2>About Me</h2>
+    <p>I'm Arihant Singh, a Master's student in Computer Science at Franklin University (2024–Present). I hold a Bachelor's in Microbiology with a minor in Chemistry from the University of Pittsburgh (2018–2022). I worked in hospital labs before discovering a strong passion for programming. Now I’m focused on backend development and building practical, scalable systems like this one.</p>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <a href="/about.html">About this Website</a> | <a href="/license.html">License</a>
+    </div>
+  </footer>
+
+  <script>
+    function goHome() {
+      const jwt = localStorage.getItem("jwt");
+      if (jwt && jwt.split('.').length === 3) {
+        window.location.href = "hub.html";
+      } else {
+        window.location.href = "login.html";
+      }
+    }
+
+    function checkToken() {
+      const token = localStorage.getItem("jwt");
+      if (!token) {
+        window.location.href = "login.html";
+        return false;
+      }
+      return true;
+    }
+  </script>
+</body>
+</html>

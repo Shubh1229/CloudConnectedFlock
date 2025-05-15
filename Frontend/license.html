@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>License - Cloud Connected Flock</title>
+  <link rel="icon" type="image/png" href="logo/CCFlock%20Logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      background-color: #0b1e3f;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+
+    header {
+    display: flex;
+    align-items: center;
+    background-color: #142b5c;
+    padding: 15px;
+    }
+
+    header span {
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    }
+
+    header img {
+    height: 24px;
+    width: 24px;
+    margin-right: 10px;
+    }
+
+    main {
+      flex: 1;
+      padding: 40px 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    pre {
+      background-color: #1b2d52;
+      padding: 20px;
+      border-radius: 6px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow-x: auto;
+    }
+
+    footer {
+      background-color: #142b5c;
+      border-top: 1px solid white;
+      width: 100%;
+      padding: 15px 0;
+    }
+
+    .footer-inner {
+      max-width: 800px;
+      margin: auto;
+      text-align: center;
+    }
+
+    .footer-inner a {
+      color: white;
+      text-decoration: underline;
+      margin: 0 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <span onclick="goHome()">
+        <img src="logo/CCFlock%20Logo.png" alt="Logo" />
+        Cloud Connected Flock
+    </span>
+  </header>
+
+  <main>
+    <h1>License</h1>
+    <pre id="license-text">Loading license...</pre>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <a href="/about.html">About this Website</a> | <a href="/license.html">License</a>
+    </div>
+  </footer>
+
+  <script>
+    function goHome() {
+      const jwt = localStorage.getItem("jwt");
+      if (jwt && jwt.split('.').length === 3) {
+        window.location.href = "hub.html";
+      } else {
+        window.location.href = "login.html";
+      }
+    }
+
+    function checkToken() {
+      const token = localStorage.getItem('jwt');
+      if (!token) {
+        window.location.href = 'login.html';
+        return false;
+      }
+      return true;
+    }
+
+    async function loadLicense() {
+      try {
+        const response = await fetch('license/License');
+        if (!response.ok) {
+          document.getElementById('license-text').textContent = 'Failed to load license.';
+          return;
+        }
+        const text = await response.text();
+        document.getElementById('license-text').textContent = text;
+      } catch (err) {
+        document.getElementById('license-text').textContent = 'Error loading license.';
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', loadLicense);
+  </script>
+</body>
+</html>
