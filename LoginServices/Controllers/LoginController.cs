@@ -14,9 +14,9 @@ namespace LoginServices.Controllers
     [Route("[controller]")]
     public class LoginController : ControllerBase
     {
-        
+
         private static readonly GrpcChannel channel = GrpcChannel.ForAddress("http://account-service:9000");
-        
+
         private static readonly AccountService.Grpc.AccountService.AccountServiceClient client = new AccountService.Grpc.AccountService.AccountServiceClient(channel);
 
         private static readonly GrpcChannel heartbeatChannel = GrpcChannel.ForAddress("http://heartbeat-service:9005");
@@ -24,7 +24,7 @@ namespace LoginServices.Controllers
         private static readonly HeartBeatService.Grpc.HeartBeatService.HeartBeatServiceClient heartbeatClient = new HeartBeatService.Grpc.HeartBeatService.HeartBeatServiceClient(heartbeatChannel);
 
         private readonly IConfiguration config;
-        
+
         private readonly ILogger logger;
         public LoginController(ILogger<LoginController> logger, IConfiguration config)
         {
@@ -48,7 +48,8 @@ namespace LoginServices.Controllers
             if (reply != null)
             {
                 logger.LogInformation($"Login Info: {reply.Message}\nLogin MessageType: {reply.MessageType}\nLogin Successful: {reply.CorrectAccountCredentials}");
-            } else
+            }
+            else
             {
                 logger.LogInformation("Reply is NULL...");
                 return StatusCode(500, "Unknown error from server.");
@@ -62,7 +63,8 @@ namespace LoginServices.Controllers
                     result = reply.MessageType,
                     message = reply.Message
                 });
-            } else
+            }
+            else
             {
                 logger.LogInformation("HeartBeat Sent");
                 await heartbeatClient.SendHeartbeatAsync(new HeartbeatRequest
@@ -99,32 +101,95 @@ namespace LoginServices.Controllers
                     token = tokenString
                 });
             }
-            
+
         }
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] AccountRegistration request)
         {
-            
-            var client = new AccountService.Grpc.AccountService.AccountServiceClient(channel);
 
             logger.LogInformation("Sending GetUserRequest Waiting for Reply...");
-            var reply = await client.CreateAccountAsync( new CreateAccountRequest{
+            var reply = await client.CreateAccountAsync(new CreateAccountRequest
+            {
                 Username = request.Username,
                 Password = request.Password,
                 Email = request.Email,
-                Birthday = request.Birthday.ToString()
+                Birthday = request.Birthday.ToString(),
+                SecurityAnswers = { request.SecurityAnswers }
             });
             if (reply == null)
             {
                 return StatusCode(500, "Unknown error from server.");
-            } 
+            }
 
-            return Ok( new
+            return Ok(new
             {
                 result = reply.MessageType,
                 message = reply.Message
             });
 
+        }
+
+        [HttpPost("security")]
+        public async Task<IActionResult> SecurityAnswers([FromBody] SecurityAnswersDTO answer)
+        {
+
+            logger.LogInformation($"Received {answer}\nsending request...");
+
+            var reply = await client.VerifySecurityQuestionAsync(new SecurityQuestionCheckRequest
+            {
+                SecurityAnswer = answer.Answer,
+                Username = answer.Username,
+                SecurityQuestion = answer.SecurityQuestion
+            });
+
+            logger.LogInformation($"Got reply {reply}");
+
+            return Ok(new
+            {
+                Success = reply.Verified,
+                Message = reply.Message
+            });
+
+        }
+
+        [HttpPost("email")]
+        public async Task<IActionResult> EmailInsteadofUsername([FromBody] EmailDTO email)
+        {
+            logger.LogInformation($"Received email {email}");
+            var reply = await client.GetUsernameByEmailAsync(new EmailRequest
+            {
+                Email = email.Email
+            });
+
+            logger.LogInformation($"Got reply {reply}");
+
+            return Ok(new
+            {
+                Username = reply.Username,
+                Found = reply.Found
+            });
+        }
+
+        [HttpPost("resetpassword")]
+        public async Task<IActionResult> ResetPassword([FromBody] PasswordDTO pass)
+        {
+            logger.LogInformation($"Received {pass}");
+            var reply = await client.ResetPasswordAsync(new ResetPasswordRequest
+            {
+                Username = pass.Username,
+                NewPassword = pass.Password
+            });
+            string msg = "Password Reset";
+            if (!reply.Success)
+            {
+                msg = "Username Incorrect Password Not Reset";
+            }
+            logger.LogInformation($"got reply {reply} with message {msg}");
+            return Ok(new
+            {
+                Success = reply.Success,
+                Message = msg
+            });
         }
 
     }

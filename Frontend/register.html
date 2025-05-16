@@ -124,14 +124,38 @@
     <form id="registerForm">
       <label for="username">Username</label>
       <input type="text" id="username" placeholder="Username" required />
+
       <label for="email">Email</label>
       <input type="email" id="email" placeholder="Email" required />
+
       <label for="password">Password</label>
       <input type="password" id="password" placeholder="Password" required />
+
+      <label for="confirmPassword">Confirm Password</label>
+      <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
+
       <label for="birthday">Birthday</label>
       <input type="date" id="birthday" required />
+
+      <label for="q1">What is your mother’s maiden name?</label>
+      <input type="text" id="q1" required />
+
+      <label for="q2">What is the name of your first pet?</label>
+      <input type="text" id="q2" required />
+
+      <label for="q3">Where were you born?</label>
+      <input type="text" id="q3" required />
+
+      <label for="q4">What street did you grow up on?</label>
+      <input type="text" id="q4" required />
+
+      <label for="q5">What high school did you go to?</label>
+      <input type="text" id="q5" required />
+
       <button type="submit">Register</button>
-    </form>
+  </form>
+
+
     <a href="login.html">Already have an account? Log in</a>
   </main>
 
@@ -173,12 +197,32 @@
       const username = document.getElementById('username').value;
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
       const birthday = document.getElementById('birthday').value;
+
+      const answers = [
+        document.getElementById('q1').value,
+        document.getElementById('q2').value,
+        document.getElementById('q3').value,
+        document.getElementById('q4').value,
+        document.getElementById('q5').value
+      ];
+
+      if (password !== confirmPassword) {
+        showToast("Passwords do not match.", true);
+        return;
+      }
 
       const response = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password, birthday })
+        body: JSON.stringify({
+          username,
+          email,
+          password,
+          birthday,
+          securityAnswers: answers
+        })
       });
 
       const result = await response.json();
@@ -212,5 +256,6 @@
       }
     });
   </script>
+
 </body>
 </html>

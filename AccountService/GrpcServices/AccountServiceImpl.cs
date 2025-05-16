@@ -26,13 +26,25 @@ namespace AccountService.GrpcServices
 
             var (hash, key) = PasswordHelper.HashPassword(request.Password);
 
+            List<byte[]> securityAnswersHashed = new List<byte[]>();
+            List<byte[]> securityAnswersKeys = new List<byte[]>();
+
+            foreach (string answer in request.SecurityAnswers)
+            {
+                var (securityHash, securityKey) = PasswordHelper.HashPassword(answer);
+                securityAnswersHashed.Add(securityHash);
+                securityAnswersKeys.Add(securityKey);
+            }
+
             var newAccount = new UserAccount
             {
                 Username = request.Username,
                 Email = request.Email,
                 PasswordHash = hash,
                 PasswordKey = key,
-                Birthday = DateOnly.Parse(request.Birthday)
+                Birthday = DateOnly.Parse(request.Birthday),
+                SecurityAnswersHash = securityAnswersHashed,
+                SecurityAnswerKey = securityAnswersKeys
             };
 
             logger.LogInformation("Checking if Account Username Already Exists in Database");
@@ -130,5 +142,103 @@ namespace AccountService.GrpcServices
                 MessageType = 4
             };
         }
+
+        public override async Task<UsernameReply> GetUsernameByEmail(EmailRequest request, ServerCallContext context)
+        {
+            logger.LogInformation($"got request {request}");
+            var account = await dbContext.UserAccounts.FirstOrDefaultAsync(mail => mail.Email == request.Email);
+            logger.LogInformation($"got account {account}");
+            if (account == null)
+            {
+                return new UsernameReply
+                {
+                    Username = "",
+                    Found = false
+                };
+            }
+
+            logger.LogInformation($"sending username {account.Username}");
+            return new UsernameReply
+            {
+                Username = account.Username,
+                Found = true
+            };
+        }
+
+        public override async Task<SecurityCheckReply> VerifySecurityQuestion(SecurityQuestionCheckRequest request, ServerCallContext context)
+        {
+            logger.LogInformation($"got request {request}");
+            var reply = await dbContext.UserAccounts.FirstOrDefaultAsync(name => name.Username == request.Username);
+            logger.LogInformation($"got reply {reply}");
+            if (reply == null)
+            {
+                return new SecurityCheckReply
+                {
+                    Verified = false,
+                    Message = "User Not Found..."
+                };
+            }
+
+            logger.LogInformation($"hashing answer {request.SecurityAnswer}");
+
+            var securityHash = reply.SecurityAnswersHash;
+            var secuirtyKey = reply.SecurityAnswerKey;
+
+            
+            int i = (int)request.SecurityQuestion;
+
+            logger.LogInformation($"using index {i}");
+
+            var valid = PasswordHelper.VerifyPassword(request.SecurityAnswer, securityHash[i], secuirtyKey[i]);
+
+            logger.LogInformation($"answer is {valid}");
+            if (valid)
+            {
+                return new SecurityCheckReply
+                {
+                    Verified = true,
+                    Message = "Security Answer Correct!!!"
+                };
+            }
+
+            return new SecurityCheckReply
+            {
+                Verified = false,
+                Message = "Security Answer Incorrect..."
+            };
+        }
+
+        public override async Task<SuccessfulChangeReply> ResetPassword(ResetPasswordRequest request, ServerCallContext context)
+        {
+            logger.LogInformation($"got request {request}");
+            var account = await dbContext.UserAccounts.FirstOrDefaultAsync(user => user.Username == request.Username);
+            
+            logger.LogInformation($"got account {account}");
+            if (account == null)
+            {
+                return new SuccessfulChangeReply
+                {
+                    Success = false
+                };
+            }
+
+            logger.LogInformation($"hashing new account password {request.NewPassword}");
+
+            var (hash, key) = PasswordHelper.HashPassword(request.NewPassword);
+
+            account.PasswordHash = hash;
+            account.PasswordKey = key;
+
+            await dbContext.UserAccounts.Where(user => user.Username == account.Username)
+                    .ExecuteUpdateAsync(user => user.SetProperty(oh => oh.PasswordHash, account.PasswordHash)
+                        .SetProperty(ok => ok.PasswordKey, account.PasswordKey));
+                        
+            logger.LogInformation($"updated user... {account} ");
+            return new SuccessfulChangeReply
+            {
+                Success = true
+            };
+        }
+
     }
 }
