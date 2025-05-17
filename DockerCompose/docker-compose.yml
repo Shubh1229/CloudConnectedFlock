@@ -98,6 +98,37 @@ services:
             - "9002:9002"
         networks:
             - ccflocknet
+    profile-postgres-db:
+        image: postgres:15
+        platform: linux/amd64
+        container_name: profile-postgres-db
+        restart: always
+        environment:
+            POSTGRES_USER: shubh
+            POSTGRES_PASSWORD: 8342AdksnAKe
+            POSTGRES_DB: profiledb
+        ports:
+            - "5433:5432"  # different external port
+        volumes:
+            - profilepgdata:/var/lib/postgresql/data
+        networks:
+            - ccflocknet
+
+    profile-service:
+        platform: linux/amd64
+        build:
+            context: ../
+            dockerfile: ProfileService/Dockerfile
+        environment:
+            - ConnectionStrings__DefaultConnection=Host=profile-postgres-db;Port=5432;Database=profiledb;Username=shubh;Password=8342AdksnAKe
+            - Jwt__Key=7bATceklEQce5y28HMFU1YwYJcBna4Jz
+        ports:
+            - "5005:80"
+            - "5006:443"
+        depends_on:
+            - profile-postgres-db
+        networks:
+            - ccflocknet
     nginx:
         image: nginx:stable
         platform: linux/amd64
@@ -117,6 +148,7 @@ services:
 
 volumes:
     pgdata:
+    profilepgdata:
 
 networks:
   ccflocknet:
