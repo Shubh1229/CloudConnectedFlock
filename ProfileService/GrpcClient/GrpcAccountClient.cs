@@ -1,6 +1,9 @@
 
 
+using AccountService.Grpc;
 using Grpc.Net.Client;
+using Microsoft.IdentityModel.Tokens;
+using ProfileService.DTOs;
 
 namespace ProfileService.GrpcClient
 {
@@ -16,6 +19,68 @@ namespace ProfileService.GrpcClient
             this.logger = logger;
         }
 
-        
+        public async Task<EditUserProfileDTO> GetAccountInfo(string request)
+        {
+            var reply = await client.GetAccountProfileAsync(new GetUserAccount
+            {
+                Username = request
+            });
+
+            EditUserProfileDTO profile = new EditUserProfileDTO
+            {
+                Username = reply.Username,
+                Birthday = DateOnly.Parse(reply.Birthday),
+                Email = reply.Email,
+            };
+
+            return profile;
+        }
+
+        public async Task<EditUserProfileDTO> SendAccountInfo(SendEditsDTO edits)
+        {
+            SuccessfulChangeReply reply = new SuccessfulChangeReply { };
+            if (!edits.NewUsername.IsNullOrEmpty() && edits.NewUsername == edits.Username)
+            {
+                reply = await client.UpdateAccountAsync(new UpdateAccountRequest
+                {
+                    Username = edits.Username,
+                    Email = edits.Email,
+                    Password = edits.Password,
+                    Birthday = edits.Birthday.ToString()
+                });
+                return new EditUserProfileDTO
+                { 
+                    Username = edits.Username,
+                    Email = edits.Email,
+                    Password = edits.Password,
+                    Birthday = edits.Birthday
+                };
+            }
+            else if (!edits.NewUsername.IsNullOrEmpty() && edits.NewUsername != edits.Username)
+            {
+                reply = await client.UpdateAccountAsync(new UpdateAccountRequest
+                {
+                    Username = edits.NewUsername,
+                    Email = edits.Email,
+                    Password = edits.Password,
+                    Birthday = edits.Birthday.ToString()
+                });
+                return new EditUserProfileDTO
+                {
+                    Username = edits.NewUsername,
+                    Email = edits.Email,
+                    Password = edits.Password,
+                    Birthday = edits.Birthday
+                };
+            }
+            else
+            {
+                reply = new SuccessfulChangeReply
+                {
+                    Success = false
+                };
+                throw new InvalidDataException($"Something went wrong with the data {edits}");
+            }
+        } 
     }
 }

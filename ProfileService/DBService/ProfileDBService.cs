@@ -28,7 +28,35 @@ namespace ProfileService.DBService
                 Bio = profile.Bio,
                 PersonalLinks = profile.PersonalLinks,
                 ResumeFilePath = profile.ResumeFilePath,
-                ProfilePicturePath = profile.ProfilePicturePath
+                ProfilePicturePath = profile.ProfilePicturePath,
+                CanEdit = false
+            };
+        }
+
+        public async Task<ProfileDTO> UpdateProfileInfo(SendEditsDTO edits)
+        {
+            var profile = await dbContext.UserProfiles.FirstOrDefaultAsync(u => u.Username == edits.Username);
+            if (profile == null) return new ProfileDTO { CanEdit = true, Username = edits.Username };
+
+            profile.FirstName = edits.FirstName;
+            profile.LastName = edits.LastName;
+            profile.Bio = edits.Bio;
+            profile.PersonalLinks = edits.PersonalLinks;
+            profile.ResumeFilePath = edits.ResumeFilePath;
+            profile.ProfilePicturePath = edits.ProfilePicturePath;
+
+            await dbContext.SaveChangesAsync();
+
+            return new ProfileDTO
+            {
+                CanEdit = true,
+                Username = edits.Username,
+                FirstName = edits.FirstName,
+                LastName = edits.LastName,
+                Bio = edits.Bio,
+                PersonalLinks = edits.PersonalLinks,
+                ResumeFilePath = edits.ResumeFilePath,
+                ProfilePicturePath = edits.ProfilePicturePath
             };
         }
     }

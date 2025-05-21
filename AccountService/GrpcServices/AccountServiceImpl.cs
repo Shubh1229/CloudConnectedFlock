@@ -184,7 +184,7 @@ namespace AccountService.GrpcServices
             var securityHash = reply.SecurityAnswersHash;
             var secuirtyKey = reply.SecurityAnswerKey;
 
-            
+
             int i = (int)request.SecurityQuestion;
 
             logger.LogInformation($"using index {i}");
@@ -212,7 +212,7 @@ namespace AccountService.GrpcServices
         {
             logger.LogInformation($"got request {request}");
             var account = await dbContext.UserAccounts.FirstOrDefaultAsync(user => user.Username == request.Username);
-            
+
             logger.LogInformation($"got account {account}");
             if (account == null)
             {
@@ -232,13 +232,15 @@ namespace AccountService.GrpcServices
             await dbContext.UserAccounts.Where(user => user.Username == account.Username)
                     .ExecuteUpdateAsync(user => user.SetProperty(oh => oh.PasswordHash, account.PasswordHash)
                         .SetProperty(ok => ok.PasswordKey, account.PasswordKey));
-                        
+
             logger.LogInformation($"updated user... {account} ");
             return new SuccessfulChangeReply
             {
                 Success = true
             };
         }
+        
+
 
     }
 }
