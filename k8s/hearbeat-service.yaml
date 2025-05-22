@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: heartbeat-service
+  namespace: ccflock
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: heartbeat-service
+  template:
+    metadata:
+      labels:
+        app: heartbeat-service
+    spec:
+      containers:
+        - name: heartbeat-service
+          image: asingh1229/heartbeat-service:latest
+          ports:
+            - containerPort: 9005
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: heartbeat-service
+  namespace: ccflock
+spec:
+  selector:
+    app: heartbeat-service
+  ports:
+    - port: 9005

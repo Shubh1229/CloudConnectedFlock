@@ -109,8 +109,8 @@
         Cloud Connected Flock
     </span>
   <div>
-    <a href="/profile.html">My Profile</a>
-    <a href="/groupchat.html">Group Chat</a>
+    <a href="#" id="profileLink">My Profile</a>
+    <a href="#" id="groupChatLink">Group Chat</a>
     <button onclick="logout()">Logout</button>
   </div>
 </header>
@@ -281,6 +281,9 @@
       video.addEventListener('contextmenu', e => e.preventDefault());
     }
   });
+  const user = localStorage.getItem("username");
+  document.getElementById("profileLink").href = `profile.html?user=${encodeURIComponent(user)}`;
+  document.getElementById("groupChatLink").href = `groupchat.html?user=${encodeURIComponent(user)}`;
 </script>
 
 

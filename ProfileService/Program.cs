@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using ProfileService.DBService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,12 +66,15 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
+builder.Services.AddScoped<ProfileDBService>();
+builder.Services.AddGrpc();
+
 
 
 
 var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!");
+app.MapGrpcService<ProfileServiceGrpcImpl>();
 
 using (var scope = app.Services.CreateScope())
 {

@@ -6,6 +6,8 @@ using AccountService.AccountModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using AccountService.Security;
+using ProfileService.Grpc;
+using Grpc.Net.Client;
 
 namespace AccountService.GrpcServices
 {
@@ -13,6 +15,8 @@ namespace AccountService.GrpcServices
     {
         private readonly AccountDbContext dbContext;
         private readonly ILogger<AccountServiceImpl> logger;
+        private static readonly GrpcChannel grpcChannel = GrpcChannel.ForAddress("http://profile-service:9008");
+        private static readonly ProfileService.Grpc.ProfileService.ProfileServiceClient client = new ProfileService.Grpc.ProfileService.ProfileServiceClient(grpcChannel);
 
         public AccountServiceImpl(AccountDbContext context, ILogger<AccountServiceImpl> logger)
         {
@@ -81,8 +85,12 @@ namespace AccountService.GrpcServices
             dbContext.UserAccounts.Add(newAccount);
             await dbContext.SaveChangesAsync();
 
+            var reply = await client.SendNewAccountProfileAsync(new ProfileRequest
+            {
+                Username = newAccount.Username,
+            });
 
-            logger.LogInformation("Account Successfully Persisted to DB");
+            logger.LogInformation($"Account Successfully Persisted to DB and was {reply.Success} when creating a new profile");
             return new CreateAccountReply
             {
                 Success = true,
@@ -239,7 +247,77 @@ namespace AccountService.GrpcServices
                 Success = true
             };
         }
-        
+
+        public override async Task<SuccessfulChangeReply> UpdateAccount(UpdateAccountRequest request, ServerCallContext context)
+        {
+            try
+            {
+                var oldProfile = await dbContext.UserAccounts.FirstOrDefaultAsync(old => old.Username == request.Username);
+                if (oldProfile == null) return new SuccessfulChangeReply { Success = false };
+                var oldKey = oldProfile.PasswordKey;
+                var oldHash = oldProfile.PasswordHash;
+                string newPassword = request.Password;
+                if (newPassword != null && PasswordHelper.VerifyPassword(request.Password, oldHash, oldKey))
+                {
+                    oldProfile.Birthday = DateOnly.Parse(request.Birthday);
+                    oldProfile.Email = request.Email;
+                    if (request.Newusername != null || request.Newusername != oldProfile.Username)
+                    {
+                        oldProfile.Username = request.Newusername;
+                    }
+                    else
+                    {
+                        oldProfile.Username = request.Username;
+                    }
+                    await dbContext.SaveChangesAsync();
+
+                }
+                else
+                {
+                    var (newHash, newKey) = PasswordHelper.HashPassword(request.Password);
+                    oldProfile.Birthday = DateOnly.Parse(request.Birthday);
+                    oldProfile.Email = request.Email;
+                    if (request.Newusername != null || request.Newusername != oldProfile.Username)
+                    {
+                        oldProfile.Username = request.Newusername;
+                    }
+                    else
+                    {
+                        oldProfile.Username = request.Username;
+                    }
+                    oldProfile.PasswordHash = newHash;
+                    oldProfile.PasswordKey = newKey;
+                    await dbContext.SaveChangesAsync();
+                }
+                return new SuccessfulChangeReply
+                {
+                    Success = true
+                };
+            }
+            catch (Exception e)
+            {
+                return new SuccessfulChangeReply
+                {
+                    Success = false
+                };
+            }
+        }
+
+        public override async Task<AccountInfo> GetAccountProfile(GetUserAccount request, ServerCallContext context)
+        {
+            var profile = await dbContext.UserAccounts.FirstOrDefaultAsync(u => u.Username == request.Username);
+            if (profile == null)
+            {
+                throw new Exception();
+            }
+            return new AccountInfo
+            {
+                Username = profile.Username,
+                Email = profile.Email,
+                Birthday = profile.Birthday.ToString(),
+                Updated = false
+            };
+        }
 
 
     }

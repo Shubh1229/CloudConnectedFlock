@@ -213,6 +213,7 @@
 
     if (result.token) {
       localStorage.setItem('jwt', result.token);
+      localStorage.setItem('username', username);
     }
 
     console.log("the results are ", result);
@@ -220,7 +221,7 @@
     switch (result.result) {
       case 4:
         showToast("Login Successful!", false);
-        setTimeout(() => window.location.href = 'hub.html', 1000);
+        setTimeout(() => window.location.href = `hub.html?user=${encodeURIComponent(username)}`, 1000);
         break;
       case 3:
         showToast("Incorrect Username or Password...", true);

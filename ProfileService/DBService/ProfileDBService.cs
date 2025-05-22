@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using ProfileService.DTOs;
+using ProfileService.GrpcClient;
 using ProfileService.ProfileData;
+using ProfileService.ProfileModels;
 namespace ProfileService.DBService
 {
     public class ProfileDBService
@@ -44,6 +47,11 @@ namespace ProfileService.DBService
             profile.PersonalLinks = edits.PersonalLinks;
             profile.ResumeFilePath = edits.ResumeFilePath;
             profile.ProfilePicturePath = edits.ProfilePicturePath;
+            if (!edits.NewUsername.IsNullOrEmpty() && edits.NewUsername != edits.Username)
+            {
+                
+                profile.Username = edits.NewUsername;
+            }
 
             await dbContext.SaveChangesAsync();
 
@@ -58,6 +66,28 @@ namespace ProfileService.DBService
                 ResumeFilePath = edits.ResumeFilePath,
                 ProfilePicturePath = edits.ProfilePicturePath
             };
+        }
+
+        public async Task<bool> addProfile(string username)
+        {
+            try
+            {
+                await dbContext.UserProfiles.AddAsync(new UserProfile
+                {
+                    Username = username,
+                    ProfilePicturePath = "assets/defaultUserPic.jpg",
+                    FirstName = "Not added",
+                    LastName = "Not added",
+                    Bio = "Not added",
+                    PersonalLinks = "Not added"
+                });
+                await dbContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception)
+            {
+                return false;
+            }
         }
     }
 }

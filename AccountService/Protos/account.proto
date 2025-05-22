@@ -64,6 +64,7 @@ message UpdateAccountRequest {
   string email = 2;
   string password = 3;
   string birthday = 4;
+  string newusername = 5;
 }
 
 message Usernames {

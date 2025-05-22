@@ -5,7 +5,7 @@ namespace ProfileService.DTOs
         public required string Username { get; set; }
         public string? Password { get; set; }
         public string? Email { get; set; }
-        public DateOnly? Birthday { get; set; }
+        public string? Birthday { get; set; }
 
     }
 }

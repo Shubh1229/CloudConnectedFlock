@@ -6,7 +6,7 @@ namespace ProfileService.DTOs
         public string? NewUsername { get; set; }
         public string? Password { get; set; }
         public required string Email { get; set; }
-        public required DateOnly Birthday { get; set; }
+        public required string Birthday { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public string? Bio { get; set; }

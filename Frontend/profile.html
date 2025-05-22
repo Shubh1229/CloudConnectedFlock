@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Profile - Cloud Connected Flock</title>
+  <link rel="icon" href="logo/CCFlock%20Logo.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background-color: #0b1e3f;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      background-color: #142b5c;
+      padding: 15px;
+    }
+
+    header span {
+      font-size: 1.2em;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    header img {
+      height: 24px;
+      width: 24px;
+      margin-right: 10px;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    .profile-header {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 900px;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .profile-header h1 {
+      margin: 0;
+    }
+
+    #editButton {
+      padding: 10px 16px;
+      background-color: #3c6eec;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .profile-card {
+      background-color: #1c2b4f;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+      width: 100%;
+      max-width: 900px;
+    }
+    .profile-container {
+      display: flex;
+      flex-direction: row; /* ✅ Ensure side-by-side layout */
+      align-items: flex-start; /* ✅ Align to the top */
+      justify-content: flex-start;
+      gap: 40px;
+      width: 100%;
+      max-width: 900px;
+      flex-wrap: nowrap; /* ✅ Prevent stacking */
+    }
+
+    .profile-left {
+      width: 200px;
+      flex-shrink: 0;
+      text-align: center;
+    }
+
+    .profile-left img {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 50%;
+      box-shadow: 0 0 10px black;
+    }
+
+    .profile-left h2 {
+      margin-top: 15px;
+      font-size: 1.4em;
+    }
+
+    .profile-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .profile-field {
+      margin-bottom: 16px;
+    }
+
+    .profile-field .label {
+      font-weight: bold;
+      display: inline-block;
+      width: 140px;
+    }
+
+    .profile-field .value {
+      display: inline-block;
+    }
+
+    footer {
+      background-color: #142b5c;
+      padding: 15px 0;
+      text-align: center;
+      margin-top: auto;
+    }
+
+    footer a {
+      color: white;
+      text-decoration: underline;
+      margin: 0 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <span onclick="goHome()">
+      <img src="logo/CCFlock%20Logo.png" alt="Logo" />
+      Cloud Connected Flock
+    </span>
+  </header>
+
+  <main>
+    <div class="profile-header">
+      <h1>Profile</h1>
+      <button id="editButton" onclick="goToEdit()">Edit Profile</button>
+    </div>
+    <div class="profile-card">
+      <div class="profile-container">
+        <div class="profile-left">
+          <img id="profilePic" src="assets/defaultUserPic.jpg" alt="Profile Picture" />
+          <h2 id="profileUsername">Username</h2>
+        </div>
+        <div class="profile-right" id="profileDetails">
+          <!-- JS will populate this -->
+        </div>
+    </div>
+    </div>
+  </main>
+
+  <footer>
+    <a href="about.html">About this Website</a> | <a href="license.html">License</a>
+  </footer>
+
+  <script>
+    const token = localStorage.getItem("jwt");
+    const currentProfile = new URLSearchParams(window.location.search).get("user");
+    const defaultPic = "assets/defaultUserPic.jpg";
+
+    async function loadProfile() {
+      const res = await fetch("/api/getprofile", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ profilename: currentProfile })
+      });
+
+      if (!res.ok) {
+        document.getElementById("profileDetails").innerText = "Failed to load profile.";
+        return;
+      }
+
+      const result = await res.json();
+      const profile = result.profile;
+
+      document.getElementById("profileUsername").innerText = profile.username;
+      document.getElementById("profilePic").src = profile.profilePicturePath || defaultPic;
+
+      const right = document.getElementById("profileDetails");
+      right.innerHTML = `
+        <div class="profile-field"><span class="label">First Name:</span><span class="value">${profile.firstName || "Not added"}</span></div>
+        <div class="profile-field"><span class="label">Last Name:</span><span class="value">${profile.lastName || "Not added"}</span></div>
+        <div class="profile-field"><span class="label">Bio:</span><span class="value">${profile.bio || "Not added"}</span></div>
+        <div class="profile-field"><span class="label">Personal Links:</span><span class="value">${profile.personalLinks || "Not added"}</span></div>
+        <div class="profile-field"><span class="label">Resume:</span><span class="value">${profile.resumeFilePath ? `<a href="${profile.resumeFilePath}" target="_blank">View</a>` : "Not uploaded"}</span></div>
+      `;
+
+      if (profile.canEdit) {
+        document.getElementById("editButton").style.display = "block";
+      }
+    }
+
+    function goHome() {
+      const user = localStorage.getItem("username");
+      window.location.href = `hub.html?user=${encodeURIComponent(user)}`;
+    }
+
+    function goToEdit() {
+      const currentProfile = new URLSearchParams(window.location.search).get("user");
+      window.location.href = `editprofile.html?user=${encodeURIComponent(currentProfile)}`;
+    }
+
+    loadProfile();
+  </script>
+</body>
+</html>
+

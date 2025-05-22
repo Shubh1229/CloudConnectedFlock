@@ -9,8 +9,8 @@ namespace ProfileService.GrpcClient
 {
     public class GrpcAccountClient
     {
-        private static readonly GrpcChannel channel = GrpcChannel.ForAddress("http://account-services:9000");
-        private readonly AccountService.Grpc.AccountService.AccountServiceClient client = new AccountService.Grpc.AccountService.AccountServiceClient(channel);
+        private static readonly GrpcChannel channel = GrpcChannel.ForAddress("http://account-service:9000");
+        private static readonly AccountService.Grpc.AccountService.AccountServiceClient client = new AccountService.Grpc.AccountService.AccountServiceClient(channel);
 
         private readonly ILogger<GrpcAccountClient> logger;
 
@@ -29,7 +29,7 @@ namespace ProfileService.GrpcClient
             EditUserProfileDTO profile = new EditUserProfileDTO
             {
                 Username = reply.Username,
-                Birthday = DateOnly.Parse(reply.Birthday),
+                Birthday = reply.Birthday,
                 Email = reply.Email,
             };
 
@@ -46,7 +46,8 @@ namespace ProfileService.GrpcClient
                     Username = edits.Username,
                     Email = edits.Email,
                     Password = edits.Password,
-                    Birthday = edits.Birthday.ToString()
+                    Birthday = edits.Birthday.ToString(),
+                    Newusername = null
                 });
                 return new EditUserProfileDTO
                 { 
@@ -63,7 +64,8 @@ namespace ProfileService.GrpcClient
                     Username = edits.NewUsername,
                     Email = edits.Email,
                     Password = edits.Password,
-                    Birthday = edits.Birthday.ToString()
+                    Birthday = edits.Birthday.ToString(),
+                    Newusername = edits.NewUsername
                 });
                 return new EditUserProfileDTO
                 {

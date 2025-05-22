@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Edit Profile - Cloud Connected Flock</title>
+  <link rel="icon" href="logo/CCFlock%20Logo.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background-color: #0b1e3f;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      background-color: #142b5c;
+      padding: 15px;
+    }
+
+    header span {
+      font-size: 1.2em;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    header img {
+      height: 24px;
+      width: 24px;
+      margin-right: 10px;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    .profile-header {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 900px;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .profile-header h1 {
+      margin: 0;
+    }
+
+    .profile-card {
+      background-color: #1c2b4f;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .profile-container {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: flex-start;
+      gap: 40px;
+      width: 100%;
+      flex-wrap: nowrap;
+    }
+
+    .profile-left {
+      width: 200px;
+      flex-shrink: 0;
+      text-align: center;
+    }
+
+    .profile-left img {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 50%;
+      box-shadow: 0 0 10px black;
+    }
+
+    .profile-left h2 {
+      margin-top: 15px;
+      font-size: 1.4em;
+    }
+
+    .profile-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .profile-field {
+      margin-bottom: 16px;
+    }
+
+    .profile-field label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .profile-field input, .profile-field textarea {
+      width: 100%;
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 1em;
+    }
+
+    button#saveButton {
+      align-self: flex-start;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #3c6eec;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    footer {
+      background-color: #142b5c;
+      padding: 15px 0;
+      text-align: center;
+      margin-top: auto;
+    }
+
+    footer a {
+      color: white;
+      text-decoration: underline;
+      margin: 0 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <span onclick="goHome()">
+      <img src="logo/CCFlock%20Logo.png" alt="Logo" />
+      Cloud Connected Flock
+    </span>
+  </header>
+
+  <main>
+    <div class="profile-header">
+      <h1>Edit Profile</h1>
+    </div>
+
+    <div class="profile-card">
+      <div class="profile-container">
+        <div class="profile-left">
+          <img id="profilePic" src="assets/defaultUserPic.jpg" alt="Profile Picture" />
+          <h2 id="profileUsername">Username</h2>
+        </div>
+
+        <div class="profile-right">
+          <div class="profile-field">
+            <label for="firstName">First Name</label>
+            <input id="firstName" type="text" />
+          </div>
+          <div class="profile-field">
+            <label for="lastName">Last Name</label>
+            <input id="lastName" type="text" />
+          </div>
+          <div class="profile-field">
+            <label for="bio">Bio</label>
+            <textarea id="bio" rows="3"></textarea>
+          </div>
+          <div class="profile-field">
+            <label for="links">Personal Links</label>
+            <input id="links" type="text" />
+          </div>
+          <div class="profile-field">
+            <label for="resume">Resume Path (Temporary)</label>
+            <input id="resume" type="text" />
+          </div>
+          <button id="saveButton">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <a href="about.html">About this Website</a> | <a href="license.html">License</a>
+  </footer>
+
+  <script>
+    const token = localStorage.getItem("jwt");
+    const username = localStorage.getItem("username");
+    const defaultPic = "assets/defaultUserPic.jpg";
+    let loadedProfile = null;
+
+    async function loadProfile() {
+      const res = await fetch("/api/getprofile", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ profilename: username })
+      });
+
+      if (!res.ok) {
+        alert("Failed to load profile.");
+        return;
+      }
+
+      const result = await res.json();
+      const profile = result.profile;
+      loadedProfile = profile;
+
+      document.getElementById("profileUsername").innerText = profile.username;
+      document.getElementById("profilePic").src = profile.profilePicturePath || defaultPic;
+
+      document.getElementById("firstName").value = profile.firstName || "";
+      document.getElementById("lastName").value = profile.lastName || "";
+      document.getElementById("bio").value = profile.bio || "";
+      document.getElementById("links").value = profile.personalLinks || "";
+      document.getElementById("resume").value = profile.resumeFilePath || "";
+    }
+
+    document.getElementById("saveButton").addEventListener("click", async () => {
+      if (!loadedProfile) return alert("Profile not loaded yet.");
+
+      const payload = {
+        username: username,
+        newUsername: null,
+        email: "placeholder@email.com",  // backend expects this for now
+        birthday: "2000-01-01",          // placeholder date
+        firstName: document.getElementById("firstName").value,
+        lastName: document.getElementById("lastName").value,
+        bio: document.getElementById("bio").value,
+        personalLinks: document.getElementById("links").value,
+        resumeFilePath: document.getElementById("resume").value,
+        profilePicturePath: null,
+        updated: true
+      };
+
+      const res = await fetch("/api/sendedits", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        alert("Failed to save profile.");
+        return;
+      }
+
+      const result = await res.json();
+
+      if (result.success) {
+        alert("Profile updated!");
+        window.location.href = `profile.html?user=${encodeURIComponent(username)}`;
+      } else {
+        alert("Save failed: " + result.message);
+      }
+    });
+
+    function goHome() {
+      window.location.href = `hub.html?user=${encodeURIComponent(username)}`;
+    }
+
+    loadProfile();
+  </script>
+</body>
+</html>

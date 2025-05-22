@@ -28,6 +28,7 @@ services:
             - Jwt__Key=7bATceklEQce5y28HMFU1YwYJcBna4Jz
         depends_on:
             - postgres
+            - profile-service
         networks:
             - ccflocknet
     
@@ -125,6 +126,7 @@ services:
         ports:
             - "5005:80"
             - "5006:443"
+            - "9008:9008"
         depends_on:
             - profile-postgres-db
         networks:
