@@ -20,6 +20,35 @@
     padding: 15px;
     }
 
+    .header-links {
+      display: flex;
+      gap: 20px;
+      margin-left: 20px;
+    }
+
+    /* Move logout button to right */
+    .logout-btn {
+      margin-left: auto;
+      background-color: #dc3545 !important;
+      text-decoration: none; /* Remove underline */
+    }
+
+    .logout-btn:hover {
+      background-color: #b52a37 !important;
+    }
+
+    /* Remove underline only from the button */
+    button, .action-btn {
+      text-decoration: none !important;
+    }
+
+    /* Keep underline for links */
+    .header-links a {
+      text-decoration: underline;
+      color: white;
+    }
+
+
     header span {
     font-size: 1.2em;
     font-weight: bold;
@@ -78,7 +107,27 @@
       -webkit-user-select: none;
       user-select: none;
     }
-
+    .action-btn {
+      font-size: 1rem;
+      font-weight: bold;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      color: white;
+      white-space: nowrap;
+      line-height: 1.2;
+      box-sizing: border-box;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 42px; /* Keep button height consistent */
+      background-color: #3c6eec;
+      transition: background-color 0.2s ease;
+    }
+    .action-btn:hover {
+      background-color: #345dd1;
+    }
 
     footer {
       background-color: #142b5c;
@@ -104,15 +153,17 @@
 <body>
 
 <header>
-    <span onclick="goHome()">
-        <img src="logo/CCFlock%20Logo.png" alt="Logo" />
-        Cloud Connected Flock
-    </span>
-  <div>
+  <span onclick="goHome()">
+    <img src="logo/CCFlock%20Logo.png" alt="Logo" />
+    Cloud Connected Flock
+  </span>
+  <nav class="header-links">
     <a href="#" id="profileLink">My Profile</a>
     <a href="#" id="groupChatLink">Group Chat</a>
-    <button onclick="logout()">Logout</button>
-  </div>
+  </nav>
+  <button id="logoutButton" class="action-btn logout-btn">
+    Logout
+  </button>
 </header>
 
 <div id="online-box">
@@ -138,10 +189,11 @@
 </footer>
 
 <script>
-  function logout() {
+  document.getElementById("logoutButton").addEventListener("click", () => {
     localStorage.removeItem("jwt");
+    localStorage.removeItem("username");
     window.location.href = "login.html";
-  }
+  });
 
   function goHome() {
     const jwt = localStorage.getItem("jwt");

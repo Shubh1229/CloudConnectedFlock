@@ -27,7 +27,6 @@
 
   <ItemGroup>
     <Protobuf Include="Protos\account.proto" GrpcServices="Client"/>
-    <Protobuf Include="Protos\heartbeat.proto" GrpcServices="Client"/>
     <Protobuf Include="Protos\profile.proto" GrpcServices="Server"/>
   </ItemGroup>
 

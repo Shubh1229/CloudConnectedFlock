@@ -12,7 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ProfileDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddSingleton<GrpcAccountClient>();
-builder.Services.AddSingleton<GrpcHeartbeatClient>();
 builder.WebHost.ConfigureKestrel(options =>
     {
         options.Configure(builder.Configuration.GetSection("Kestrel"));
@@ -81,6 +80,8 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<ProfileDbContext>();
     db.Database.Migrate();
 }
+app.UseStaticFiles(); // This enables serving files from wwwroot
+
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

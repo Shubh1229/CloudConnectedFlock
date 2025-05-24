@@ -16,6 +16,7 @@ service AccountService {
   rpc VerifySecurityQuestion (SecurityQuestionCheckRequest) returns (SecurityCheckReply);
   rpc ResetPassword (ResetPasswordRequest) returns (SuccessfulChangeReply);
   rpc GetAccountProfile (GetUserAccount) returns (AccountInfo);
+  rpc DeleteAccount (AccountUsername) returns (SuccessfulChangeReply);
 }
 
 message CreateAccountRequest {
@@ -111,4 +112,8 @@ message AccountInfo {
   string email = 2;
   string birthday = 3;
   bool updated = 4;
+}
+
+message AccountUsername {
+  string username = 1;
 }

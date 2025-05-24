@@ -89,5 +89,40 @@ namespace ProfileService.DBService
                 return false;
             }
         }
+
+        public async Task UpdateProfileResumePath(string updatedusername, string file)
+        {
+            var profile = await dbContext.UserProfiles.FirstOrDefaultAsync(u => u.Username == updatedusername);
+            if (profile == null)
+            {
+                throw new Exception($"Could not find profile using new username {updatedusername}");
+            }
+            profile.ResumeFilePath = file;
+            await dbContext.SaveChangesAsync();
+        }
+
+        public async Task UpdateProfilePicPath(string updatedusername, string file)
+        {
+            var profile = await dbContext.UserProfiles.FirstOrDefaultAsync(u => u.Username == updatedusername);
+            if (profile == null)
+            {
+                throw new Exception($"Could not find profile using new username {updatedusername}");
+            }
+            profile.ProfilePicturePath = file;
+            await dbContext.SaveChangesAsync();
+        }
+
+        public async Task<bool> DeleteProfile(string username)
+        {
+            var profile = await dbContext.UserProfiles.FirstOrDefaultAsync(u => u.Username == username);
+            if (profile == null)
+            {
+                return false;
+            }
+            dbContext.UserProfiles.Remove(profile);
+            await dbContext.SaveChangesAsync();
+            return true;
+        }
+
     }
 }

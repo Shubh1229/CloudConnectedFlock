@@ -253,42 +253,53 @@ namespace AccountService.GrpcServices
             try
             {
                 var oldProfile = await dbContext.UserAccounts.FirstOrDefaultAsync(old => old.Username == request.Username);
-                if (oldProfile == null) return new SuccessfulChangeReply { Success = false };
+                if (oldProfile == null)
+                {
+                    return new SuccessfulChangeReply { Success = false };
+                }
+
                 var oldKey = oldProfile.PasswordKey;
                 var oldHash = oldProfile.PasswordHash;
                 string newPassword = request.Password;
-                if (newPassword != null && PasswordHelper.VerifyPassword(request.Password, oldHash, oldKey))
+
+                // === Case 1: No password provided ===
+                if (string.IsNullOrWhiteSpace(newPassword))
                 {
                     oldProfile.Birthday = DateOnly.Parse(request.Birthday);
                     oldProfile.Email = request.Email;
-                    if (request.Newusername != null || request.Newusername != oldProfile.Username)
-                    {
-                        oldProfile.Username = request.Newusername;
-                    }
-                    else
-                    {
-                        oldProfile.Username = request.Username;
-                    }
-                    await dbContext.SaveChangesAsync();
+                    oldProfile.Username = string.IsNullOrWhiteSpace(request.Newusername)
+                                        ? request.Username
+                                        : request.Newusername;
 
+                    await dbContext.SaveChangesAsync();
                 }
+                // === Case 2: Password is the same as current (verified) ===
+                else if (PasswordHelper.VerifyPassword(newPassword, oldHash, oldKey))
+                {
+                    oldProfile.Birthday = DateOnly.Parse(request.Birthday);
+                    oldProfile.Email = request.Email;
+                    oldProfile.Username = string.IsNullOrWhiteSpace(request.Newusername)
+                                        ? request.Username
+                                        : request.Newusername;
+
+                    await dbContext.SaveChangesAsync();
+                }
+                // === Case 3: New valid password provided ===
                 else
                 {
-                    var (newHash, newKey) = PasswordHelper.HashPassword(request.Password);
+                    var (newHash, newKey) = PasswordHelper.HashPassword(newPassword);
+
                     oldProfile.Birthday = DateOnly.Parse(request.Birthday);
                     oldProfile.Email = request.Email;
-                    if (request.Newusername != null || request.Newusername != oldProfile.Username)
-                    {
-                        oldProfile.Username = request.Newusername;
-                    }
-                    else
-                    {
-                        oldProfile.Username = request.Username;
-                    }
+                    oldProfile.Username = string.IsNullOrWhiteSpace(request.Newusername)
+                                        ? request.Username
+                                        : request.Newusername;
                     oldProfile.PasswordHash = newHash;
                     oldProfile.PasswordKey = newKey;
+
                     await dbContext.SaveChangesAsync();
                 }
+
                 return new SuccessfulChangeReply
                 {
                     Success = true
@@ -296,6 +307,9 @@ namespace AccountService.GrpcServices
             }
             catch (Exception e)
             {
+                // Log for debugging, optional
+                Console.WriteLine($"UpdateAccount error: {e.Message}");
+
                 return new SuccessfulChangeReply
                 {
                     Success = false
@@ -303,12 +317,14 @@ namespace AccountService.GrpcServices
             }
         }
 
+
+
         public override async Task<AccountInfo> GetAccountProfile(GetUserAccount request, ServerCallContext context)
         {
             var profile = await dbContext.UserAccounts.FirstOrDefaultAsync(u => u.Username == request.Username);
             if (profile == null)
             {
-                throw new Exception();
+                return new AccountInfo { };
             }
             return new AccountInfo
             {
@@ -317,6 +333,18 @@ namespace AccountService.GrpcServices
                 Birthday = profile.Birthday.ToString(),
                 Updated = false
             };
+        }
+
+        public override async Task<SuccessfulChangeReply> DeleteAccount(AccountUsername request, ServerCallContext context)
+        {
+            var profile = await dbContext.UserAccounts.FirstOrDefaultAsync(u => u.Username == request.Username);
+            if (profile == null)
+            {
+                return new SuccessfulChangeReply { Success = false };
+            }
+            dbContext.UserAccounts.Remove(profile);
+            await dbContext.SaveChangesAsync();
+            return new SuccessfulChangeReply { Success = true };
         }
 
 

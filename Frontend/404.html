@@ -113,5 +113,36 @@
       }
     }
   </script>
+  <script>
+    async function sendHeartbeat() {
+      const token = localStorage.getItem("jwt");
+      if (!token || token.split('.').length !== 3) {
+        console.warn("JWT missing or malformed. Skipping heartbeat...");
+        window.location.href = "login.html";
+        return;
+      }
+
+      try {
+        const response = await fetch("/api/heartbeat", {
+          method: "POST",
+          headers: {
+            "Authorization": "Bearer " + token
+          }
+        });
+        if (!response.ok) {
+          console.error("Heartbeat failed with status:", response.status);
+          return;
+        }
+        const result = await response.json();
+        console.log("Heartbeat response:", result);
+      } catch (err) {
+        console.error("Heartbeat failed:", err);
+      }
+    }
+
+    sendHeartbeat();
+
+    setInterval(sendHeartbeat, 5000);
+  </script>
 </body>
 </html>

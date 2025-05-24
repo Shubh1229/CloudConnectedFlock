@@ -26,6 +26,11 @@ namespace ProfileService.GrpcClient
                 Username = request
             });
 
+            if (string.IsNullOrEmpty(reply.Username) || string.IsNullOrWhiteSpace(reply.Username))
+            {
+                return new EditUserProfileDTO { Username = string.Empty};
+            }
+
             EditUserProfileDTO profile = new EditUserProfileDTO
             {
                 Username = reply.Username,
@@ -38,35 +43,38 @@ namespace ProfileService.GrpcClient
 
         public async Task<EditUserProfileDTO> SendAccountInfo(SendEditsDTO edits)
         {
-            SuccessfulChangeReply reply = new SuccessfulChangeReply { };
-            if (!edits.NewUsername.IsNullOrEmpty() && edits.NewUsername == edits.Username)
+            if (!string.IsNullOrEmpty(edits.NewUsername) && edits.NewUsername == edits.Username)
             {
-                reply = await client.UpdateAccountAsync(new UpdateAccountRequest
+                // Username stays the same, treat as a normal update
+                var reply = await client.UpdateAccountAsync(new UpdateAccountRequest
                 {
                     Username = edits.Username,
-                    Email = edits.Email,
-                    Password = edits.Password,
-                    Birthday = edits.Birthday.ToString(),
-                    Newusername = null
+                    Email = edits.Email ?? string.Empty,
+                    Password = edits.Password ?? string.Empty,
+                    Birthday = edits.Birthday.ToString() ?? string.Empty,
+                    Newusername = string.Empty
                 });
+
                 return new EditUserProfileDTO
-                { 
+                {
                     Username = edits.Username,
                     Email = edits.Email,
                     Password = edits.Password,
                     Birthday = edits.Birthday
                 };
             }
-            else if (!edits.NewUsername.IsNullOrEmpty() && edits.NewUsername != edits.Username)
+            else if (!string.IsNullOrEmpty(edits.NewUsername) && edits.NewUsername != edits.Username)
             {
-                reply = await client.UpdateAccountAsync(new UpdateAccountRequest
+                // Username change
+                var reply = await client.UpdateAccountAsync(new UpdateAccountRequest
                 {
-                    Username = edits.NewUsername,
-                    Email = edits.Email,
-                    Password = edits.Password,
-                    Birthday = edits.Birthday.ToString(),
-                    Newusername = edits.NewUsername
+                    Username = edits.Username,
+                    Email = edits.Email ?? string.Empty,
+                    Password = edits.Password ?? string.Empty,
+                    Birthday = edits.Birthday.ToString() ?? string.Empty,
+                    Newusername = edits.NewUsername ?? string.Empty
                 });
+
                 return new EditUserProfileDTO
                 {
                     Username = edits.NewUsername,
@@ -77,12 +85,30 @@ namespace ProfileService.GrpcClient
             }
             else
             {
-                reply = new SuccessfulChangeReply
+                // NewUsername is null or empty — just update without a username change
+                var reply = await client.UpdateAccountAsync(new UpdateAccountRequest
                 {
-                    Success = false
+                    Username = edits.Username,
+                    Email = edits.Email ?? string.Empty,
+                    Password = edits.Password ?? string.Empty,
+                    Birthday = edits.Birthday.ToString() ?? string.Empty,
+                    Newusername = string.Empty
+                });
+
+                return new EditUserProfileDTO
+                {
+                    Username = edits.Username,
+                    Email = edits.Email ?? string.Empty,
+                    Password = edits.Password ?? string.Empty,
+                    Birthday = edits.Birthday
                 };
-                throw new InvalidDataException($"Something went wrong with the data {edits}");
             }
-        } 
+        }
+
+        public async Task<bool> DeleteAccount(string username)
+        {
+            var reply = await client.DeleteAccountAsync(new AccountUsername { Username = username });
+            return reply.Success;
+        }
     }
 }

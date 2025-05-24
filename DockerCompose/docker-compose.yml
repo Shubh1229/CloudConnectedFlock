@@ -129,6 +129,8 @@ services:
             - "9008:9008"
         depends_on:
             - profile-postgres-db
+        volumes:
+            - ../ProfileService/wwwroot/assets:/app/wwwroot/assets
         networks:
             - ccflocknet
     nginx:
