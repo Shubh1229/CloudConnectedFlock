@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CCFlock Group Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background: #111;
+            color: #fff;
+            font-family: 'Consolas', 'Fira Mono', 'Menlo', monospace;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            padding: 1rem 2rem;
+            background: #18181a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #333;
+        }
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #9ae34c;
+            letter-spacing: 2px;
+            user-select: none;
+        }
+        .logout-btn {
+            background: transparent;
+            border: 2px solid #ff2d55;
+            color: #ff2d55;
+            border-radius: 1.5rem;
+            padding: 0.4rem 1.3rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+            box-shadow: 0 1px 12px #0007;
+        }
+        .logout-btn:hover {
+            background: #ff2d55;
+            color: #fff;
+        }
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 0 0 1rem 0;
+        }
+        #chat-box {
+            max-height: 70vh;
+            min-height: 500px;
+            overflow-y: auto;
+            background: #18181a;
+            margin: 1.5rem 2.5rem;
+            border-radius: 1.5rem;
+            padding: 1.2rem 2rem;
+            box-shadow: 0 2px 14px #0005;
+            font-size: 1.1rem;
+        }
+        .message {
+            margin-bottom: 0.7em;
+            word-break: break-word;
+        }
+        .username {
+            color: #2fff2f;
+            font-weight: bold;
+        }
+        .timestamp {
+            color: #c77dff;
+            margin-left: 0.4em;
+            font-size: 0.95em;
+        }
+        .msg-content {
+            color: #fff;
+            margin-left: 0.5em;
+        }
+        form {
+            display: flex;
+            align-items: center;
+            padding: 0 2.5rem;
+        }
+        .return-btn {
+            background: transparent;
+            border: 2px solid #00bfff;
+            color: #00bfff;
+            border-radius: 1.5rem;
+            padding: 0.4rem 1.3rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+            box-shadow: 0 1px 12px #0007;
+        }
+        .return-btn:hover {
+            background: #00bfff;
+            color: #fff;
+        }
+        #msg-input {
+            flex: 1;
+            background: #1d1d22;
+            color: #fff;
+            border: none;
+            outline: none;
+            border-radius: 1.5rem;
+            font-size: 1.1rem;
+            padding: 0.7rem 1.5rem;
+            margin-right: 1rem;
+            margin-top: 0.5rem;
+            box-shadow: 0 1px 6px #0005;
+        }
+        #send-btn {
+            background: #2fff2f;
+            color: #222;
+            border: none;
+            border-radius: 1.5rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            padding: 0.7rem 2.2rem;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 1px 8px #0004;
+        }
+        #send-btn:hover {
+            background: #25be39;
+            color: #fff;
+        }
+        @media (max-width: 700px) {
+            header, form {padding: 1rem; margin: 0.4rem} #chat-box {padding: 1rem; margin: 0.4rem }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">CCFlock Group Chat</div>
+        <div style="display: flex; gap: 1rem;">
+            <button class="return-btn" onclick="goToMain()">Return to Main</button>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </header>
+    <main>
+        <div id="chat-box">
+            <!-- Messages will be dynamically inserted here -->
+        </div>
+        <form id="chat-form" autocomplete="off">
+            <input id="msg-input" type="text" maxlength="500" placeholder="Type your message..." required />
+            <button id="send-btn" type="submit">Send</button>
+        </form>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@latest/dist/browser/signalr.min.js"></script>
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        const form = document.getElementById('chat-form');
+        const input = document.getElementById('msg-input');
+        const username = localStorage.getItem("username") || "anon";
+
+        // Add message to chat box
+        function addMessage(user, time, text) {
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message');
+            msgDiv.innerHTML = `
+                <span class="username">[${user}]</span>
+                <span class="timestamp">[${time}]</span>:
+                <span class="msg-content">"${text}"</span>
+            `;
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Connect to SignalR hub
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/api/groupchat/hub")
+            .configureLogging(signalR.LogLevel.Information)
+            .build();
+
+        // Receive live chat messages
+        connection.on("ReceiveMessage", function(formattedMsg) {
+            // formattedMsg example: [username][YYYY-MM-DD HH:MM:SS]: "message"
+            const match = formattedMsg.match(/^\[(.+?)\]\[(.+?)\]: "(.*)"$/);
+            let user = formattedMsg, time = "", text = "";
+            if (match) {
+                user = match[1];
+                time = match[2];
+                text = match[3];
+            }
+            addMessage(user, time, text);
+        });
+
+        // Start SignalR connection, then load previous chat history
+        connection.start().then(function() {
+            // Fetch previous chat messages
+            fetch("/api/recent")
+                .then(res => res.ok ? res.json() : [])
+                .then(data => {
+                    // If no history, show welcome message
+                    if (!data || !Array.isArray(data) || data.length === 0) {
+                        addMessage("admin", new Date().toLocaleString("en-US", {
+                            month: '2-digit', day: '2-digit',
+                            hour: '2-digit', minute: '2-digit',
+                            hour12: false
+                        }), "Welcome to the CCFlock group chat!");
+                    } else {
+                        // Show oldest first (reverse chronological in Redis, so reverse)
+                        data.reverse().forEach(msgObj => {
+                            addMessage(msgObj.username, 
+                                    msgObj.dateTime.replace("T", " ").slice(0, 16), // pretty timestamp
+                                    msgObj.message);
+                        });
+                    }
+                })
+                .catch(() => {
+                    // On error, show welcome
+                    addMessage("admin", new Date().toLocaleString("en-US", {
+                        month: '2-digit', day: '2-digit',
+                        hour: '2-digit', minute: '2-digit',
+                        hour12: false
+                    }), "Welcome to the CCFlock group chat!");
+                });
+        }).catch(function(err) {
+            console.error("SignalR connection error:", err);
+            addMessage("admin", "--", "Failed to connect to chat server.");
+        });
+
+        // Send message handler
+        form.onsubmit = (e) => {
+            e.preventDefault();
+            const msg = input.value.trim();
+            if (!msg) return;
+            connection.invoke("SendMessage", username, msg)
+                .catch(function(err) {
+                    console.error("Send error:", err);
+                    addMessage("admin", "--", "Could not send message.");
+                });
+            input.value = '';
+        };
+
+        function logout() {
+            localStorage.removeItem("jwt");
+            localStorage.removeItem("username");
+            window.location.href = "login.html";
+        }
+        function goToMain() {
+            const username = localStorage.getItem("username");
+            const encodedUsername = encodeURIComponent(username);
+            window.location.href = `hub.html?name=${encodedUsername}`;
+        }
+    </script>
+    <script>
+        async function sendHeartbeat() {
+        const token = localStorage.getItem("jwt");
+        if (!token || token.split('.').length !== 3) {
+            console.warn("JWT missing or malformed. Skipping heartbeat...");
+            window.location.href = "login.html";
+            return;
+        }
+
+        try {
+            const response = await fetch("/api/heartbeat", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+            });
+            if (!response.ok) {
+            console.error("Heartbeat failed with status:", response.status);
+            return;
+            }
+            const result = await response.json();
+            //console.log("Heartbeat response:", result);
+        } catch (err) {
+            console.error("Heartbeat failed:", err);
+        }
+        }
+
+        sendHeartbeat();
+
+        setInterval(sendHeartbeat, 5000);
+    </script>
+    <script>
+        function showToast(message) {
+        const toast = document.getElementById("toast");
+        toast.innerText = message;
+        toast.style.visibility = "visible";
+        toast.style.opacity = "1";
+
+        setTimeout(() => {
+            toast.style.opacity = "0";
+            toast.style.visibility = "hidden";
+        }, 3000); // Hide after 3 seconds
+        }
+    </script>
+
+</body>
+</html>

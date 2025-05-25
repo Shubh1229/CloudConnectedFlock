@@ -13,6 +13,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 builder.Services.AddSignalR()
     .AddStackExchangeRedis("redis:6379");
 
+builder.Services.AddControllers();
 
 builder.Services.AddSingleton<GroupChatRedisService>();
 
@@ -20,5 +21,6 @@ builder.Services.AddSingleton<GroupChatRedisService>();
 var app = builder.Build();
 
 app.MapHub<GCHub>("/api/groupchat/hub");
+app.MapControllers();
 
 app.Run();
