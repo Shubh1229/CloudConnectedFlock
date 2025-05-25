@@ -7,7 +7,7 @@ service AccountService {
   rpc CreateAccount (CreateAccountRequest) returns (CreateAccountReply);
   rpc GetAccount (GetAccountRequest) returns (ReturnAccountReply);
   rpc UpdateUsername (UpdateUsernameRequest) returns (SuccessfulChangeReply);
-  rpc UpdatePassword (UpdatePasswordRequest) returns (SuccessfulChangeReply);
+  rpc UpdatePassword (UpdatePasswordRequest) returns (SuccessfulChangeReplyTwo);
   rpc UpdateEmail (UpdateEmailRequest) returns (SuccessfulChangeReply);
   rpc UpdateBirthday (UpdateBirthdayRequest) returns (SuccessfulChangeReply);
   rpc UpdateAccount (UpdateAccountRequest) returns (SuccessfulChangeReply);
@@ -49,7 +49,9 @@ message UpdateUsernameRequest {
 }
 
 message UpdatePasswordRequest {
-  string password = 1;
+  string oldpassword = 1;
+  string newpassword = 2;
+  string username = 3;
 }
 
 message UpdateEmailRequest {
@@ -116,4 +118,9 @@ message AccountInfo {
 
 message AccountUsername {
   string username = 1;
+}
+
+message SuccessfulChangeReplyTwo {
+  bool success = 1;
+  int32 type = 2;
 }

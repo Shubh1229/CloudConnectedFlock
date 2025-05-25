@@ -347,6 +347,28 @@ namespace AccountService.GrpcServices
             return new SuccessfulChangeReply { Success = true };
         }
 
+        public override async Task<SuccessfulChangeReplyTwo> UpdatePassword(UpdatePasswordRequest request, ServerCallContext context)
+        {
+            var profile = await dbContext.UserAccounts.FirstOrDefaultAsync(u => u.Username == request.Username);
+            if (profile == null)
+            {
+                return new SuccessfulChangeReplyTwo { Success = false, Type = 2 };
+            }
+            if (PasswordHelper.VerifyPassword(request.Oldpassword, profile.PasswordHash, profile.PasswordKey))
+            {
+                if (!PasswordHelper.VerifyPassword(request.Newpassword, profile.PasswordHash, profile.PasswordKey))
+                {
+                    var (hash, key) = PasswordHelper.HashPassword(request.Newpassword);
+                    profile.PasswordHash = hash;
+                    profile.PasswordKey = key;
+                    await dbContext.SaveChangesAsync();
+                    return new SuccessfulChangeReplyTwo { Success = true, Type = 1 };
+                }
+                return new SuccessfulChangeReplyTwo { Success = false, Type = 3 };
+            }
+            return new SuccessfulChangeReplyTwo { Success = false, Type = 4 };
+        }
+
 
     }
 }

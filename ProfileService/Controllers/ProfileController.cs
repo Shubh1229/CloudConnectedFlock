@@ -269,5 +269,60 @@ namespace ProfileService.Controllers
                 AccountStatus = delAccount
             });
         }
+        [HttpPost("changepassword")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO request)
+        {
+            var username = User.Identity?.Name;
+            if (username == null)
+            {
+                return BadRequest("Could not find user");
+            }
+            else if (request.Username != username)
+            {
+                return BadRequest("Incorrect User");
+            }
+            var reply = await client.ChangePassword(request);
+
+            switch (reply.Type)
+            {
+                case 1:
+                    return Ok(new
+                    {
+                        success = reply.Success,
+                        msg = "Password Successfully Changed!"
+                    });
+                case 2:
+                    return Ok(new
+                    {
+                        success = reply.Success,
+                        msg = "Could not find account..."
+                    });
+                case 3:
+                    return Ok(new
+                    {
+                        success = reply.Success,
+                        msg = "New Password is the same as Old Password..."
+                    });
+                case 4:
+                    return Ok(new
+                    {
+                        success = reply.Success,
+                        msg = "Old Password is Incorrect..."
+                    });
+                default:
+                    return BadRequest("Unkown Error Occurred");
+            }
+        }
+
+        [HttpGet("allusers")]
+        [Authorize]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            var username = User.Identity?.Name;
+            if (username == null) return BadRequest("Not Logged in Or No Account");
+            var users = await db.GetAllUsers();
+            return Ok(users);
+        }
     }
 }

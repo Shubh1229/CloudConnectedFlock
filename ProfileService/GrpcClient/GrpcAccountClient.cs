@@ -110,5 +110,16 @@ namespace ProfileService.GrpcClient
             var reply = await client.DeleteAccountAsync(new AccountUsername { Username = username });
             return reply.Success;
         }
+
+        public async Task<PasswordReplyDTO> ChangePassword(ChangePasswordDTO request)
+        {
+            var reply = await client.UpdatePasswordAsync(new UpdatePasswordRequest
+            {
+                Username = request.Username,
+                Oldpassword = request.OldPassword,
+                Newpassword = request.NewPassword
+            });
+            return new PasswordReplyDTO { Success = reply.Success, Type = reply.Type};
+        }
     }
 }

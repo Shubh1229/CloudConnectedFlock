@@ -124,5 +124,15 @@ namespace ProfileService.DBService
             return true;
         }
 
+        public async Task<List<AllUsersDTO>> GetAllUsers()
+        {
+            return await dbContext.UserProfiles.Select(
+                u => new AllUsersDTO
+                {
+                    Username = u.Username,
+                    ProfilePicPath = u.ProfilePicturePath ?? string.Empty
+                }
+            ).ToListAsync();
+        }
     }
 }
