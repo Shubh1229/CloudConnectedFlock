@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hub-service
+  namespace: ccflock
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hub-service
+  template:
+    metadata:
+      labels:
+        app: hub-service
+    spec:
+      containers:
+        - name: hub-service
+          image: asingh1229/hub-service:latest
+          ports:
+            - containerPort: 80
+            - containerPort: 443
+          env:
+            - name: Jwt__Key
+              value: "7bATceklEQce5y28HMFU1YwYJcBna4Jz"
+            - name: HeartbeatService__Address
+              value: "http://heartbeat-service:9005"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hub-service
+  namespace: ccflock
+spec:
+  selector:
+    app: hub-service
+  ports:
+    - name: "http"
+      port: 80
+    - name: "https"
+      port: 443

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option csharp_namespace = "ProfileService.Grpc";
+package account;
+
+service ProfileService {
+    rpc SendNewAccountProfile (ProfileRequest) returns (ProfileReply);
+}
+
+message ProfileRequest {
+    string username = 1;
+}
+
+message ProfileReply {
+    bool success = 1;
+}

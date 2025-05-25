@@ -16,5 +16,9 @@ namespace AccountService.AccountModels
 
         public required DateOnly Birthday { get; set; }
 
+        public required List<byte[]> SecurityAnswersHash { get; set; }
+
+        public required List<byte[]> SecurityAnswerKey { get; set; }
+
     }
 }

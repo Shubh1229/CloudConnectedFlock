@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -22,7 +23,9 @@ namespace AccountService.Migrations
                     Email = table.Column<string>(type: "text", nullable: false),
                     PasswordHash = table.Column<byte[]>(type: "bytea", nullable: true),
                     PasswordKey = table.Column<byte[]>(type: "bytea", nullable: true),
-                    Birthday = table.Column<DateOnly>(type: "date", nullable: false)
+                    Birthday = table.Column<DateOnly>(type: "date", nullable: false),
+                    SecurityAnswersHash = table.Column<List<byte[]>>(type: "bytea[]", nullable: false),
+                    SecurityAnswerKey = table.Column<List<byte[]>>(type: "bytea[]", nullable: false)
                 },
                 constraints: table =>
                 {

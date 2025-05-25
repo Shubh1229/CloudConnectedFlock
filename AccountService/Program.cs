@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using AccountService.GrpcServices;
 
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -31,7 +32,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapGrpcService<AccountService.GrpcServices.AccountServiceImpl>();
+app.MapGrpcService<AccountServiceImpl>();
 
 using (var scope = app.Services.CreateScope())
 {

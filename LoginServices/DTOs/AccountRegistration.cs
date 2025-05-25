@@ -4,10 +4,12 @@
     {
         public required string Username { get; set; }
 
-        public required string Password {  get; set; }
+        public required string Password { get; set; }
 
-        public required string Email {  get; set; }
+        public required string Email { get; set; }
 
-        public required DateOnly Birthday {  get; set; }
+        public required DateOnly Birthday { get; set; }
+        
+        public required List<string> SecurityAnswers { get; set; }
     }
 }

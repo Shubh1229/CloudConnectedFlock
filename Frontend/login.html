@@ -1,145 +1,313 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - Cloud Connected Flock</title>
-    <link rel="icon" type="image/png" href="logo/CCFlock%20Logo.png">
-    <style>
-        body {
-            background-color: #0b1e3f;
-            color: white;
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 50px;
-        }
-
-        img {
-            max-width: 200px;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            margin-bottom: 10px;
-        }
-
-        form {
-            background-color: #1b2d52;
-            padding: 20px;
-            border-radius: 8px;
-            width: 300px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        input {
-            margin-bottom: 15px;
-            padding: 10px;
-            border-radius: 4px;
-            border: none;
-        }
-
-        button {
-            padding: 10px;
-            background-color: #3c6eec;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        a {
-            margin-top: 10px;
-            color: #ccc;
-            text-align: center;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Login - Cloud Connected Flock</title>
+  <link rel="icon" type="image/png" href="logo/CCFlock%20Logo.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #0b1e3f;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      background-color: #142b5c;
+      padding: 15px;
+    }
+    header span {
+      font-size: 1.2em;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+    header img {
+      height: 24px;
+      width: 24px;
+      margin-right: 10px;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 50px 20px;
+    }
+    main img {
+      max-width: 180px;
+      margin-bottom: 20px;
+    }
+    form {
+      background-color: #1b2d52;
+      padding: 20px;
+      border-radius: 8px;
+      width: 300px;
+      display: flex;
+      flex-direction: column;
+    }
+    input, select {
+      margin-bottom: 15px;
+      padding: 10px;
+      border-radius: 4px;
+      border: none;
+    }
+    button {
+      padding: 10px;
+      background-color: #3c6eec;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    a {
+      margin-top: 10px;
+      color: #ccc;
+      text-align: center;
+    }
+    footer {
+      background-color: #142b5c;
+      border-top: 1px solid white;
+      width: 100%;
+      padding: 15px 0;
+    }
+    .footer-inner {
+      max-width: 800px;
+      margin: auto;
+      text-align: center;
+    }
+    .footer-inner a {
+      color: white;
+      text-decoration: underline;
+      margin: 0 10px;
+    }
+    #toast {
+      visibility: hidden;
+      min-width: 200px;
+      margin-left: -100px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 2px;
+      padding: 16px;
+      position: fixed;
+      z-index: 1;
+      left: 50%;
+      bottom: 30px;
+      font-size: 17px;
+    }
+    #recoveryModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 2;
+    }
+    #recoveryBox {
+      background-color: #1b2d52;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+      text-align: center;
+    }
+    #recoveryBox input, #recoveryBox select {
+      width: 100%;
+    }
+  </style>
 </head>
+
 <body>
+  <header>
+    <span onclick="goHome()">
+      <img src="logo/CCFlock%20Logo.png" alt="Logo" />
+      Cloud Connected Flock
+    </span>
+  </header>
+
+  <main>
     <img src="logo/CCFlock%20Logo.png" alt="Cloud Connected Flock Logo" />
-    <h1>Cloud Connected Flock</h1>
+    <h1>Login</h1>
     <form id="loginForm">
-        <label for="username">Username</label>
-        <input type="text" id="username" placeholder="Username" required />
-        <label for="password">Password</label>
-        <input type="password" id="password" placeholder="Password" required />
-        <button type="submit">Login</button>
+      <label for="username">Username</label>
+      <input type="text" id="username" required />
+      <label for="password">Password</label>
+      <input type="password" id="password" required />
+      <button type="submit">Login</button>
     </form>
     <a href="register.html">Don't have an account? Create one</a>
-        <div id="toast" style="
-        visibility: hidden;
-        min-width: 200px;
-        margin-left: -100px;
-        background-color: #333;
-        color: #fff;
-        text-align: center;
-        border-radius: 2px;
-        padding: 16px;
-        position: fixed;
-        z-index: 1;
-        left: 50%;
-        bottom: 30px;
-        font-size: 17px;
-        ">
+  </main>
+
+  <div id="recoveryModal">
+    <div id="recoveryBox">
+      <div style="text-align:right;">
+        <button onclick="closeRecovery()" style="background:none;border:none;color:white;font-size:20px;cursor:pointer;">×</button>
+      </div>
+      <p>Need help?</p>
+      <button onclick="showEmailRecovery()">Forgot Username</button>
+      <button onclick="showSecurityRecovery()">Forgot Password</button>
+
+      <div id="emailRecovery" style="display:none;">
+        <input type="email" id="recoveryEmail" placeholder="Enter your email" />
+        <button onclick="submitEmailRecovery()">Recover Username</button>
+      </div>
+
+      <div id="securityRecovery" style="display:none;">
+        <input type="text" id="securityUsername" placeholder="Your Username" />
+        <select id="questionIndex">
+          <option value="0">What is your mother’s maiden name?</option>
+          <option value="1">What is the name of your first pet?</option>
+          <option value="2">Where were you born?</option>
+          <option value="3">What street did you grow up on?</option>
+          <option value="4">What high school did you go to?</option>
+        </select>
+        <input type="text" id="securityAnswer" placeholder="Answer" />
+        <button onclick="submitSecurityAnswer()">Verify Answer</button>
+      </div>
     </div>
+  </div>
+  
 
-    <script>
+  <footer>
+    <div class="footer-inner">
+      <a href="/about.html">About this Website</a> | <a href="/license.html">License</a>
+    </div>
+  </footer>
 
-        console.log("Updated this login.html file just now lets see the updates");
-        document.getElementById('loginForm').addEventListener('submit', async function (e) {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+  <div id="toast"></div>
+<script>
+  function goHome() {
+    const jwt = localStorage.getItem("jwt");
+    if (jwt && jwt.split('.').length === 3) {
+      window.location.href = "hub.html";
+    } else {
+      window.location.href = "login.html";
+    }
+  }
 
-            const response = await fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
+  let failCount = 0;
 
-            if (!response.ok) {
-                alert("Network error.");
-                return;
-            }
+  document.getElementById('loginForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
 
-            const result = await response.json();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
 
-            if (result.token) {
-                localStorage.setItem('jwt', result.token); // ✅ save token
-            }
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
 
-            function showToast(message, isError = false) {
-                const toast = document.getElementById("toast");
-                toast.style.backgroundColor = isError ? "#cc0000" : "#333";
-                toast.textContent = message;
-                toast.style.visibility = "visible";
+    const result = await response.json();
 
-                setTimeout(() => {
-                    toast.style.visibility = "hidden";
-                }, 3000);
-            }
+    if (result.token) {
+      localStorage.setItem('jwt', result.token);
+      localStorage.setItem('username', username);
+    }
 
-            switch (result.result) {
-                case 4: // Success
-                    showToast("Successful Login!", false);
-                    setTimeout(() => {
-                        window.location.href = 'hub.html';
-                    }, 1000);
-                    break;
-                case 3: // Invalid credentials
-                    showToast("Incorrect Username or Password...", true);
-                    break;
-                case 1: // User not found
-                    showToast("User Not Found...", true);
-                    break;
-                default:
-                    alert(result.message || "An error occurred.");
-                    break;
-            }
-        });
-    </script>
+    console.log("the results are ", result);
+
+    switch (result.result) {
+      case 4:
+        showToast("Login Successful!", false);
+        setTimeout(() => window.location.href = `hub.html?user=${encodeURIComponent(username)}`, 1000);
+        break;
+      case 3:
+        showToast("Incorrect Username or Password...", true);
+        break;
+      case 1:
+        showToast("User Not Found...", true);
+        break;
+      default:
+        showToast(result.message || "An error occurred.", true);
+        break;
+    }
+
+    if (result.result !== 4) {
+      failCount++;
+      if (failCount >= 5) {
+        document.getElementById('recoveryModal').style.display = "flex";
+      }
+    }
+  });
+
+  function showToast(message, isError = false) {
+    const toast = document.getElementById("toast");
+    toast.style.backgroundColor = isError ? "#cc0000" : "#333";
+    toast.textContent = message;
+    toast.style.visibility = "visible";
+    setTimeout(() => toast.style.visibility = "hidden", 3000);
+  }
+
+  function showEmailRecovery() {
+    document.getElementById("emailRecovery").style.display = "block";
+    document.getElementById("securityRecovery").style.display = "none";
+  }
+
+  function showSecurityRecovery() {
+    document.getElementById("emailRecovery").style.display = "none";
+    document.getElementById("securityRecovery").style.display = "block";
+  }
+
+
+  async function submitEmailRecovery() {
+    const email = document.getElementById("recoveryEmail").value;
+    const response = await fetch('/api/emailrequest', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const result = await response.json();
+    showToast(result.found ? "Username: " + result.username : "No account found.", !result.found);
+  }
+
+  async function submitSecurityAnswer() {
+    const username = document.getElementById("securityUsername").value;
+    const index = parseInt(document.getElementById("questionIndex").value);
+    const answer = document.getElementById("securityAnswer").value;
+
+    const response = await fetch('/api/securityrequest', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        Username: username,
+        Answer: answer,
+        securityQuestion: index
+      })
+    });
+
+    const result = await response.json();
+
+    console.log("the results are ", result);
+
+    if (result.success) {
+      localStorage.setItem("reset-user", username);
+      showToast("Answer correct! Please reset password.", false);
+      setTimeout(() => {
+        window.location.href = "reset-password.html";
+      }, 1000);
+    } else {
+      showToast(result.message || "Verification failed.", true);
+    }
+
+  }
+
+  function closeRecovery() {
+    document.getElementById('recoveryModal').style.display = "none";
+    document.getElementById('emailRecovery').style.display = "none";
+    document.getElementById('securityRecovery').style.display = "none";
+  }
+</script>
 </body>
 </html>
-

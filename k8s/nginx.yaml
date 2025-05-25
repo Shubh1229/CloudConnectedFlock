@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: ccflock
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:stable
+          ports:
+            - containerPort: 80
+            - containerPort: 443
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          volumeMounts:
+            - name: nginx-conf
+              mountPath: /etc/nginx/conf.d
+              readOnly: true
+            - name: nginx-html
+              mountPath: /usr/share/nginx/html
+              readOnly: true
+            - name: nginx-certs
+              mountPath: /etc/nginx/certs
+              readOnly: true
+      volumes:
+        - name: nginx-conf
+          hostPath:
+            path: /Users/shubh/Documents/GitHub/CloudConnectedFlock/nginx/conf.d
+        - name: nginx-html
+          hostPath:
+            path: /Users/shubh/Documents/GitHub/CloudConnectedFlock/Frontend
+        - name: nginx-certs
+          hostPath:
+            path: /Users/shubh/Documents/GitHub/CloudConnectedFlock/nginx/certs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  namespace: ccflock
+spec:
+  selector:
+    app: nginx
+  ports:
+    - name: "http"
+      port: 80
+    - name: "https"
+      port: 443
