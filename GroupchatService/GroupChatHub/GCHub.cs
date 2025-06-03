@@ -29,7 +29,7 @@ namespace GroupchatService.GroupChatHub
         public async Task SendMessage(string username, string message)
         {
             string timestamp = DateTime.UtcNow.ToString("o"); // ISO 8601
-            string formatted = $"[{username}][{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}]: \"{message}\"";
+            string formatted = $"[{username}][{DateTime.UtcNow:yyyy-MM-dd HH:mm}]: \"{message}\"";
             await Clients.All.SendAsync("ReceiveMessage", formatted);
 
             await gcRedis.SendChatAsync(new ChatDTO

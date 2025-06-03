@@ -381,7 +381,7 @@
         <div class="modal-title" id="modalUserTitle"></div>
         <div class="modal-actions">
           <button class="action-btn" id="viewProfileBtn">View Profile</button>
-          <button class="action-btn" id="messageBtn" disabled style="opacity: 0.6;cursor:not-allowed;">Message (Coming Soon)</button>
+          <button class="action-btn" id="messageBtn">Message</button>
           <button class="action-btn btn-cancel" id="closeModalBtn">Cancel</button>
         </div>
       </div>
@@ -585,10 +585,18 @@
     function openUserModal(username) {
       document.getElementById("userModal").style.display = "flex";
       document.getElementById("modalUserTitle").innerText = `What do you want to do with "${username}"?`;
+
       document.getElementById("viewProfileBtn").onclick = function () {
         window.location.href = `profile.html?user=${encodeURIComponent(username)}`;
       };
-      // "Message" is disabled for now
+
+      const messageBtn = document.getElementById("messageBtn");
+      messageBtn.disabled = false;
+      messageBtn.style.opacity = "1";
+      messageBtn.style.cursor = "pointer";
+      messageBtn.onclick = function () {
+        window.location.href = `privatechat.html?user=${encodeURIComponent(username)}`;
+      };
     }
     document.getElementById("closeModalBtn").onclick = () => {
       document.getElementById("userModal").style.display = "none";

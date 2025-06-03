@@ -164,8 +164,8 @@
             const msgDiv = document.createElement('div');
             msgDiv.classList.add('message');
             msgDiv.innerHTML = `
-                <span class="username">[${user}]</span>
-                <span class="timestamp">[${time}]</span>:
+                <span class="timestamp">[${time}]</span>
+                <span class="username">[${user}]</span>:
                 <span class="msg-content">"${text}"</span>
             `;
             chatBox.appendChild(msgDiv);

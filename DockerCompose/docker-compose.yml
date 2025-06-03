@@ -95,6 +95,22 @@ services:
             - redis
         networks:
             - ccflocknet
+    privatechat-service:
+        platform: linux/amd64
+        build:
+            context: ../
+            dockerfile: PrivatechatService/Dockerfile
+        environment:
+            - Jwt__Key=7bATceklEQce5y28HMFU1YwYJcBna4Jz
+            - HeartbeatService__Address=http://heartbeat-service:9005
+        ports:
+            - "5052:80"
+            - "5053:443"
+        depends_on:
+            - heartbeat-service
+            - redis
+        networks:
+            - ccflocknet
 
     redis:
         image: redis:7
@@ -171,4 +187,6 @@ volumes:
     profilepgdata:
 
 networks:
-  ccflocknet:
+    ccflocknet:
+        external:
+            true

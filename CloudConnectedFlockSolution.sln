@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProfileService", "ProfileSe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GroupchatService", "GroupchatService\GroupchatService.csproj", "{B3498C2C-E63F-47C3-BEEA-C14CB05238E1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrivatechatService", "PrivatechatService\PrivatechatService.csproj", "{F71776B7-0C98-454A-9A95-6CA2806FBCA1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +113,18 @@ Global
 		{B3498C2C-E63F-47C3-BEEA-C14CB05238E1}.Release|x64.Build.0 = Release|Any CPU
 		{B3498C2C-E63F-47C3-BEEA-C14CB05238E1}.Release|x86.ActiveCfg = Release|Any CPU
 		{B3498C2C-E63F-47C3-BEEA-C14CB05238E1}.Release|x86.Build.0 = Release|Any CPU
+		{F71776B7-0C98-454A-9A95-6CA2806FBCA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F71776B7-0C98-454A-9A95-6CA2806FBCA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F71776B7-0C98-454A-9A95-6CA2806FBCA1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F71776B7-0C98-454A-9A95-6CA2806FBCA1}.Debug|x64.Build.0 = Debug|Any CPU
+		{F71776B7-0C98-454A-9A95-6CA2806FBCA1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F71776B7-0C98-454A-9A95-6CA2806FBCA1}.Debug|x86.Build.0 = Debug|Any CPU
+		{F71776B7-0C98-454A-9A95-6CA2806FBCA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F71776B7-0C98-454A-9A95-6CA2806FBCA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F71776B7-0C98-454A-9A95-6CA2806FBCA1}.Release|x64.ActiveCfg = Release|Any CPU
+		{F71776B7-0C98-454A-9A95-6CA2806FBCA1}.Release|x64.Build.0 = Release|Any CPU
+		{F71776B7-0C98-454A-9A95-6CA2806FBCA1}.Release|x86.ActiveCfg = Release|Any CPU
+		{F71776B7-0C98-454A-9A95-6CA2806FBCA1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
