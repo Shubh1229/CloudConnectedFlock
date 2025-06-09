@@ -51,6 +51,7 @@ services:
     
     heartbeat-service:
         platform: linux/amd64
+        restart: unless-stopped
         environment:
             - Jwt__Key=7bATceklEQce5y28HMFU1YwYJcBna4Jz
         build:
@@ -168,6 +169,7 @@ services:
     nginx:
         image: nginx:stable
         platform: linux/amd64
+        restart: unless-stopped
         ports:
             - "80:80"
             - "443:443"

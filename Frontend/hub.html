@@ -160,6 +160,7 @@
   <nav class="header-links">
     <a href="#" id="profileLink">My Profile</a>
     <a href="#" id="groupChatLink">Group Chat</a>
+    <a href="#" id="localWeatherLink">Local Weather</a>
   </nav>
   <button id="logoutButton" class="action-btn logout-btn">
     Logout
@@ -336,6 +337,7 @@
   const user = localStorage.getItem("username");
   document.getElementById("profileLink").href = `profile.html?user=${encodeURIComponent(user)}`;
   document.getElementById("groupChatLink").href = `groupchat.html?user=${encodeURIComponent(user)}`;
+  document.getElementById("localWeatherLink").href = `localweather.html?user=${encodeURIComponent(user)}`;
 </script>
 
 

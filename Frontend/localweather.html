@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Weather Data - CCFlock</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="icon" type="image/png" href="logo/CCFlock%20Logo.png">
+        <script src="js/chart.umd.min.js"></script>
+        <script src="js/date-fns.js"></script>
+        <script src="js/chartjs-adapter-date-fns.bundle.min.js"></script>
+        <style>
+            body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #0b1e3f;
+            color: white;
+            }
+
+            header {
+            display: flex;
+            align-items: center;
+            background-color: #142b5c;
+            padding: 15px;
+            }
+
+            header span {
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            }
+
+            header img {
+            height: 24px;
+            width: 24px;
+            margin-right: 10px;
+            }
+
+            h1 {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 36px;
+            }
+
+            .controls {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            gap: 10px;
+            flex-wrap: wrap;
+            }
+
+            .controls input, .controls button {
+            padding: 10px;
+            font-size: 14px;
+            }
+
+            #chartContainer {
+            width: 90%;
+            margin: auto;
+            background-color: #1a1a1a;
+            padding: 20px;
+            border-radius: 8px;
+            }
+
+            canvas {
+            background-color: #222;
+            border: 1px solid #444;
+            }
+
+            footer {
+            background-color: #142b5c;
+            border-top: 1px solid white;
+            width: 100%;
+            padding: 15px 0;
+            margin-top: 50px;
+            }
+
+            .footer-inner {
+            max-width: 800px;
+            margin: auto;
+            text-align: center;
+            }
+
+            .footer-inner a {
+            color: white;
+            text-decoration: underline;
+            margin: 0 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <span onclick="window.location.href='hub.html'">
+                <img src="logo/CCFlock%20Logo.png" alt="Logo" />
+                Cloud Connected Flock
+            </span>
+        </header>
+
+        <h1>Weather Data Visualization</h1>
+
+        <div class="controls">
+            <label>Start:
+                <input type="datetime-local" id="start">
+            </label>
+            <label>End:
+                <input type="datetime-local" id="end">
+            </label>
+            <button onclick="loadData()">Load Data</button>
+        </div>
+
+        <div id="chartContainer">
+            <canvas id="tempChart" height="100"></canvas>
+            <canvas id="humidityChart" height="100"></canvas>
+            <canvas id="pressureChart" height="100"></canvas>
+        </div>
+
+        <footer>
+            <div class="footer-inner">
+                <a href="/about.html">About this Website</a> | <a href="/license.html">License</a>
+            </div>
+        </footer>
+
+        <script>
+            let tempChart, humidityChart, pressureChart;
+
+            function createChart(ctx, label, color) {
+                return new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label,
+                            data: [],
+                            borderColor: color,
+                            fill: false,
+                            pointRadius: 2,
+                            pointHoverRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        interaction: {
+                            mode: 'nearest',
+                            axis: 'x',
+                            intersect: false
+                        },
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: {
+                                    unit: 'auto',
+                                    tooltipFormat: 'PPpp',
+                                    displayFormats: {
+                                        year: 'yyyy',
+                                        quarter: "'Q'q",
+                                        month: 'MMM',
+                                        day: 'MMM d',
+                                        hour: 'MMM d, ha',
+                                        minute: 'h:mm a',
+                                        second: 'h:mm:ss a'
+                                    }
+                                },
+                                ticks: {
+                                    color: 'white',
+                                    maxRotation: 45,
+                                    autoSkip: true,
+                                    autoSkipPadding: 15
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Time',
+                                    color: 'white'
+                                }
+                            },
+                            y: {
+                                ticks: {
+                                    color: 'white'
+                                },
+                                title: {
+                                    display: true,
+                                    text: label,
+                                    color: 'white'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                labels: { color: 'white' }
+                            },
+                            tooltip: {
+                                backgroundColor: '#222',
+                                titleFont: { size: 16 },
+                                bodyFont: { size: 14 },
+                                padding: 12,
+                                boxPadding: 8
+                            },
+                            zoom: {
+                                zoom: {
+                                    wheel: { enabled: true },
+                                    pinch: { enabled: true },
+                                    mode: 'x'
+                                },
+                                pan: {
+                                    enabled: true,
+                                    mode: 'x'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            async function loadData() {
+                const start = document.getElementById('start').value;
+                const end = document.getElementById('end').value;
+
+                let url = '/api/data/Data/alldata';
+                if (start && end) {
+                    url = `/api/data/Data/getdatarange?StartDateTime=${encodeURIComponent(start)}&EndDateTime=${encodeURIComponent(end)}`;
+                }
+
+                try {
+                    const res = await fetch(url);
+                    const json = await res.json();
+
+                    const labels = [];
+                    const tempData = [];
+                    const humidityData = [];
+                    const pressureData = [];
+
+                    json.weatherdata.forEach(entry => {
+                        const time = new Date(entry.dateTimeStampID).toISOString();
+                        labels.push(time);
+                        tempData.push(entry.temp);
+                        humidityData.push(entry.humidity);
+                        pressureData.push(entry.pressure);
+                    });
+
+                    tempChart.data.labels = labels;
+                    humidityChart.data.labels = labels;
+                    pressureChart.data.labels = labels;
+
+                    tempChart.data.datasets[0].data = tempData;
+                    humidityChart.data.datasets[0].data = humidityData;
+                    pressureChart.data.datasets[0].data = pressureData;
+
+                    tempChart.update();
+                    humidityChart.update();
+                    pressureChart.update();
+                } catch (err) {
+                    alert("Failed to load data.");
+                    console.error(err);
+                }
+            }
+
+            window.onload = () => {
+                tempChart = createChart(document.getElementById('tempChart').getContext('2d'), 'Temperature (°C)', 'red');
+                humidityChart = createChart(document.getElementById('humidityChart').getContext('2d'), 'Humidity (%)', 'blue');
+                pressureChart = createChart(document.getElementById('pressureChart').getContext('2d'), 'Pressure (hPa)', 'green');
+
+                loadData();
+            };
+        </script>
+    </body>
+</html>

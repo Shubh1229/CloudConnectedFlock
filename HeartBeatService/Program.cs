@@ -14,7 +14,13 @@ namespace HeartBeatService
             builder.Services.AddGrpc();
 
             builder.Services.AddSingleton<IConnectionMultiplexer>(
-                ConnectionMultiplexer.Connect("online-users-redis-db:6379") 
+                ConnectionMultiplexer.Connect(new ConfigurationOptions
+                {
+                    EndPoints = { "online-users-redis-db:6379" },
+                    AbortOnConnectFail = false, // <--- important!
+                    ConnectRetry = 5,
+                    ConnectTimeout = 5000
+                })
             );
 
             builder.WebHost.ConfigureKestrel(serverOptions =>
