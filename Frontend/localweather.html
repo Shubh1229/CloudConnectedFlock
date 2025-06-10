@@ -1,92 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
+    <html lang="en">
     <head>
         <meta charset="UTF-8" />
         <title>Weather Data - CCFlock</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="icon" type="image/png" href="logo/CCFlock%20Logo.png">
-        <script src="js/chart.umd.min.js"></script>
-        <script src="js/date-fns.js"></script>
-        <script src="js/chartjs-adapter-date-fns.bundle.min.js"></script>
+        <script src="https://cdn.plot.ly/plotly-2.26.0.min.js"></script>
         <style>
             body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #0b1e3f;
-            color: white;
+                margin: 0;
+                font-family: Arial, sans-serif;
+                background-color: #0b1e3f;
+                color: white;
             }
-
             header {
-            display: flex;
-            align-items: center;
-            background-color: #142b5c;
-            padding: 15px;
+                display: flex;
+                align-items: center;
+                background-color: #142b5c;
+                padding: 15px;
             }
-
             header span {
-            font-size: 1.2em;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
+                font-size: 1.2em;
+                font-weight: bold;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
             }
-
             header img {
-            height: 24px;
-            width: 24px;
-            margin-right: 10px;
+                height: 24px;
+                width: 24px;
+                margin-right: 10px;
             }
-
             h1 {
-            text-align: center;
-            margin-top: 30px;
-            font-size: 36px;
+                text-align: center;
+                margin-top: 30px;
+                font-size: 36px;
             }
-
             .controls {
-            display: flex;
-            justify-content: center;
-            margin: 20px 0;
-            gap: 10px;
-            flex-wrap: wrap;
+                display: flex;
+                justify-content: center;
+                margin: 20px 0;
+                gap: 10px;
+                flex-wrap: wrap;
             }
-
             .controls input, .controls button {
-            padding: 10px;
-            font-size: 14px;
+                padding: 10px;
+                font-size: 14px;
             }
-
             #chartContainer {
-            width: 90%;
-            margin: auto;
-            background-color: #1a1a1a;
-            padding: 20px;
-            border-radius: 8px;
+                width: 90%;
+                margin: auto;
+                background-color: #1a1a1a;
+                padding: 20px;
+                border-radius: 8px;
             }
-
-            canvas {
-            background-color: #222;
-            border: 1px solid #444;
-            }
-
             footer {
-            background-color: #142b5c;
-            border-top: 1px solid white;
-            width: 100%;
-            padding: 15px 0;
-            margin-top: 50px;
+                background-color: #142b5c;
+                border-top: 1px solid white;
+                width: 100%;
+                padding: 15px 0;
+                margin-top: 50px;
             }
-
             .footer-inner {
-            max-width: 800px;
-            margin: auto;
-            text-align: center;
+                max-width: 800px;
+                margin: auto;
+                text-align: center;
             }
-
             .footer-inner a {
-            color: white;
-            text-decoration: underline;
-            margin: 0 10px;
+                color: white;
+                text-decoration: underline;
+                margin: 0 10px;
             }
         </style>
     </head>
@@ -111,9 +94,9 @@
         </div>
 
         <div id="chartContainer">
-            <canvas id="tempChart" height="100"></canvas>
-            <canvas id="humidityChart" height="100"></canvas>
-            <canvas id="pressureChart" height="100"></canvas>
+            <div id="tempChart" style="height:300px;"></div>
+            <div id="humidityChart" style="height:300px;"></div>
+            <div id="pressureChart" style="height:300px;"></div>
         </div>
 
         <footer>
@@ -123,95 +106,6 @@
         </footer>
 
         <script>
-            let tempChart, humidityChart, pressureChart;
-
-            function createChart(ctx, label, color) {
-                return new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: [],
-                        datasets: [{
-                            label,
-                            data: [],
-                            borderColor: color,
-                            fill: false,
-                            pointRadius: 2,
-                            pointHoverRadius: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        interaction: {
-                            mode: 'nearest',
-                            axis: 'x',
-                            intersect: false
-                        },
-                        scales: {
-                            x: {
-                                type: 'time',
-                                time: {
-                                    unit: 'auto',
-                                    tooltipFormat: 'PPpp',
-                                    displayFormats: {
-                                        year: 'yyyy',
-                                        quarter: "'Q'q",
-                                        month: 'MMM',
-                                        day: 'MMM d',
-                                        hour: 'MMM d, ha',
-                                        minute: 'h:mm a',
-                                        second: 'h:mm:ss a'
-                                    }
-                                },
-                                ticks: {
-                                    color: 'white',
-                                    maxRotation: 45,
-                                    autoSkip: true,
-                                    autoSkipPadding: 15
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'Time',
-                                    color: 'white'
-                                }
-                            },
-                            y: {
-                                ticks: {
-                                    color: 'white'
-                                },
-                                title: {
-                                    display: true,
-                                    text: label,
-                                    color: 'white'
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                labels: { color: 'white' }
-                            },
-                            tooltip: {
-                                backgroundColor: '#222',
-                                titleFont: { size: 16 },
-                                bodyFont: { size: 14 },
-                                padding: 12,
-                                boxPadding: 8
-                            },
-                            zoom: {
-                                zoom: {
-                                    wheel: { enabled: true },
-                                    pinch: { enabled: true },
-                                    mode: 'x'
-                                },
-                                pan: {
-                                    enabled: true,
-                                    mode: 'x'
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
             async function loadData() {
                 const start = document.getElementById('start').value;
                 const end = document.getElementById('end').value;
@@ -224,44 +118,99 @@
                 try {
                     const res = await fetch(url);
                     const json = await res.json();
+                    console.log("RESULT: ", res);
+                    console.log("JSON: ", json);
 
                     const labels = [];
-                    const tempData = [];
-                    const humidityData = [];
-                    const pressureData = [];
+                    const temp = [];
+                    const humidity = [];
+                    const pressure = [];
 
-                    json.weatherdata.forEach(entry => {
+                    for (const entry of json.weatherdata) {
+                        if (entry.temp > 110 || entry.temp < -30 ||
+                            entry.humidity > 100 || entry.humidity < 0 ||
+                            entry.pressure < 800 || entry.pressure > 1200) {
+                            console.log("Entry Rejected: ", entry);
+                            continue;
+                        }
+
                         const time = new Date(entry.dateTimeStampID).toISOString();
                         labels.push(time);
-                        tempData.push(entry.temp);
-                        humidityData.push(entry.humidity);
-                        pressureData.push(entry.pressure);
+                        temp.push(entry.temp);
+                        humidity.push(entry.humidity);
+                        pressure.push(entry.pressure);
+                    }
+
+                    Plotly.newPlot('tempChart', [{
+                        x: labels,
+                        y: temp,
+                        type: 'scatter',
+                        mode: 'lines+markers',
+                        line: { color: 'red' },
+                        name: 'Temperature (°F)'
+                    }], {
+                        title: 'Temperature (°F)',
+                        paper_bgcolor: '#1a1a1a',
+                        plot_bgcolor: '#1a1a1a',
+                        font: { color: 'white' },
+                        yaxis: {
+                            autorange: false,
+                            fixedrange: true,
+                            range: [-30,120], // or: range: [20, 30] based on typical values
+                            tickfont: { color: 'white' },
+                            title: { text: 'Temperature (°C)', font: { color: 'white' } }
+                        }
                     });
 
-                    tempChart.data.labels = labels;
-                    humidityChart.data.labels = labels;
-                    pressureChart.data.labels = labels;
+                    Plotly.newPlot('humidityChart', [{
+                        x: labels,
+                        y: humidity,
+                        type: 'scatter',
+                        mode: 'lines+markers',
+                        line: { color: 'blue' },
+                        name: 'Humidity (%)'
+                    }], {
+                        title: 'Humidity (%)',
+                        paper_bgcolor: '#1a1a1a',
+                        plot_bgcolor: '#1a1a1a',
+                        font: { color: 'white' },
+                        yaxis: {
+                            autorange: false,
+                            fixedrange: true,
+                            range: [0,100], // or: range: [20, 30] based on typical values
+                            tickfont: { color: 'white' },
+                            title: { text: '% Humidity', font: { color: 'white' } }
+                        }
+                    });
 
-                    tempChart.data.datasets[0].data = tempData;
-                    humidityChart.data.datasets[0].data = humidityData;
-                    pressureChart.data.datasets[0].data = pressureData;
+                    Plotly.newPlot('pressureChart', [{
+                        x: labels,
+                        y: pressure,
+                        type: 'scatter',
+                        mode: 'lines+markers',
+                        line: { color: 'green' },
+                        name: 'Pressure (hPa)'
+                    }], {
+                        title: 'Pressure (hPa)',
+                        paper_bgcolor: '#1a1a1a',
+                        plot_bgcolor: '#1a1a1a',
+                        font: { color: 'white' },
+                        yaxis: {
+                            autorange: false,
+                            fixedrange: true,
+                            range: [700,1200], // or: range: [20, 30] based on typical values
+                            tickfont: { color: 'white' },
+                            title: { text: ' hPa', font: { color: 'white' } }
+                        }
+                    });
 
-                    tempChart.update();
-                    humidityChart.update();
-                    pressureChart.update();
                 } catch (err) {
                     alert("Failed to load data.");
                     console.error(err);
                 }
             }
 
-            window.onload = () => {
-                tempChart = createChart(document.getElementById('tempChart').getContext('2d'), 'Temperature (°C)', 'red');
-                humidityChart = createChart(document.getElementById('humidityChart').getContext('2d'), 'Humidity (%)', 'blue');
-                pressureChart = createChart(document.getElementById('pressureChart').getContext('2d'), 'Pressure (hPa)', 'green');
-
-                loadData();
-            };
+            window.onload = loadData;
         </script>
     </body>
 </html>
