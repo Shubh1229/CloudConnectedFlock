@@ -1,9 +1,9 @@
 
 
 using HubService.DTO;
-using HubService.Services;
 using Microsoft.AspNetCore.Mvc;
-using WeatherService;
+using HubService.Services;
+using static HubService.Services.WeatherAPIClient;
 
 namespace  HubService.Controllers {
     [ApiController]
@@ -11,11 +11,11 @@ namespace  HubService.Controllers {
     public class WeatherController : ControllerBase{
 
         private readonly ILogger<WeatherController> logger;
-        private readonly GrpcWeatherClient grpcWeatherClient;
+        private WeatherAPIClient WeatherClient;
 
-        public WeatherController(ILogger<WeatherController> logger, GrpcWeatherClient grpcWeatherClient) {
+        public WeatherController(ILogger<WeatherController> logger, WeatherAPIClient WeatherClient) {
             this.logger = logger;
-            this.grpcWeatherClient = grpcWeatherClient;
+            this.WeatherClient = WeatherClient;
         }
 
         [HttpPost("weather")]
@@ -26,7 +26,7 @@ namespace  HubService.Controllers {
                 Latitude = req.Latitude
             };
             logger.LogInformation("Weather request created and sent...");
-            var response = await grpcWeatherClient.WeatherResponse(request);
+            var response = await WeatherClient.GetForecast(request);
 
             var weather = new WeatherDTO{
                 Temp = response.TemperatureC,

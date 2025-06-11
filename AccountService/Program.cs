@@ -7,10 +7,6 @@ using AccountService.GrpcServices;
 var builder = WebApplication.CreateBuilder(args);
 
 
-// Register the PostgreSQL database context
-builder.Services.AddDbContext<AccountDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
     serverOptions.Configure(builder.Configuration.GetSection("Kestrel"));
@@ -34,11 +30,6 @@ app.MapControllers();
 
 app.MapGrpcService<AccountServiceImpl>();
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AccountDbContext>();
-    db.Database.Migrate();
-}
 
 
 app.Run();

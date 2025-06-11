@@ -1,20 +1,4 @@
 services:
-    postgres:
-        image: postgres:15
-        platform: linux/amd64
-        container_name: accounts-postgres-db
-        restart: always
-        
-        environment:
-            POSTGRES_USER: shubh
-            POSTGRES_PASSWORD: 8342AdksnAKe
-            POSTGRES_DB: accountsdb
-        ports:
-            - "5432:5432"
-        volumes:
-            - pgdata:/var/lib/postgresql/data
-        networks:
-            - ccflocknet
 
     account-service:
         platform: linux/amd64
@@ -24,10 +8,9 @@ services:
         ports:
             - "9000:9000"
         environment:
-            - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=accountsdb;Username=shubh;Password=8342AdksnAKe
+            - ConnectionStrings__DefaultConnection=Host=ccflock-db;Port=5432;Database=ccflockdb;Username=shubh;Password=8342AdksnAKe
             - Jwt__Key=7bATceklEQce5y28HMFU1YwYJcBna4Jz
         depends_on:
-            - postgres
             - profile-service
         networks:
             - ccflocknet
@@ -71,7 +54,6 @@ services:
             dockerfile: HubService/Dockerfile
         environment:
             - Jwt__Key=7bATceklEQce5y28HMFU1YwYJcBna4Jz
-            - HeartbeatService__Address=http://heartbeat-service:9005
         ports:
             - "5003:80"
             - "5004:443"
@@ -87,7 +69,6 @@ services:
             dockerfile: GroupchatService/Dockerfile
         environment:
             - Jwt__Key=7bATceklEQce5y28HMFU1YwYJcBna4Jz
-            - HeartbeatService__Address=http://heartbeat-service:9005
         ports:
             - "5050:80"
             - "5051:443"
@@ -123,49 +104,47 @@ services:
         networks:
             - ccflocknet
 
-    weather-service:
-        platform: linux/amd64
-        build:
-            context: ../
-            dockerfile: WeatherService/Dockerfile
-        ports:
-            - "9002:9002"
-        networks:
-            - ccflocknet
-    profile-postgres-db:
-        image: postgres:15
-        platform: linux/amd64
-        container_name: profile-postgres-db
-        restart: always
-        environment:
-            POSTGRES_USER: shubh
-            POSTGRES_PASSWORD: 8342AdksnAKe
-            POSTGRES_DB: profiledb
-        ports:
-            - "5433:5432"  # different external port
-        volumes:
-            - profilepgdata:/var/lib/postgresql/data
-        networks:
-            - ccflocknet
-
     profile-service:
         platform: linux/amd64
         build:
             context: ../
             dockerfile: ProfileService/Dockerfile
         environment:
-            - ConnectionStrings__DefaultConnection=Host=profile-postgres-db;Port=5432;Database=profiledb;Username=shubh;Password=8342AdksnAKe
+            - ConnectionStrings__DefaultConnection=Host=ccflock-db;Port=5432;Database=ccflockdb;Username=shubh;Password=8342AdksnAKe
             - Jwt__Key=7bATceklEQce5y28HMFU1YwYJcBna4Jz
         ports:
             - "5005:80"
             - "5006:443"
             - "9008:9008"
-        depends_on:
-            - profile-postgres-db
         volumes:
             - ../ProfileService/wwwroot/assets:/app/wwwroot/assets
         networks:
             - ccflocknet
+    database-service:
+        build:
+            context: ../
+            dockerfile: DatabaseService/Dockerfile
+        ports:
+            - "9011:9011"
+        networks:
+            - ccflocknet
+
+    
+    ccflock-db:
+        image: postgres:15
+        platform: linux/arm64
+        restart: always
+        environment:
+            POSTGRES_USER: shubh
+            POSTGRES_PASSWORD: 8342AdksnAKe
+            POSTGRES_DB: ccflockdb
+        ports:
+            - "5439:5432"
+        volumes:
+            - ccflockpgdata:/var/lib/postgresql/data
+        networks:
+            - ccflocknet
+        
     nginx:
         image: nginx:stable
         platform: linux/amd64
@@ -187,6 +166,7 @@ services:
 volumes:
     pgdata:
     profilepgdata:
+    ccflockpgdata:
 
 networks:
     ccflocknet:

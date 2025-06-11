@@ -20,9 +20,6 @@ namespace HubService
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
 
-            builder.Services.AddSingleton<GrpcHeartbeatClient>();
-            builder.Services.AddSingleton<GrpcWeatherClient>();
-            //builder.Services.AddSingleton<MqttClientService>();
 
             builder.WebHost.ConfigureKestrel(options =>
             {
@@ -87,11 +84,6 @@ namespace HubService
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-            //using (var scope = app.Services.CreateScope())
-            //{
-            //    var mqtt = scope.ServiceProvider.GetRequiredService<MqttClientService>();
-            //    await mqtt.ConnectAsync();
-            //}
 
             app.UseHttpsRedirection();
             app.UseAuthorization();
