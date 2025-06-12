@@ -94,9 +94,9 @@
         </div>
 
         <div id="chartContainer">
-            <div id="tempChart" style="height:300px;"></div>
-            <div id="humidityChart" style="height:300px;"></div>
-            <div id="pressureChart" style="height:300px;"></div>
+            <div id="tempChart" style="height:600px;"></div>
+            <div id="humidityChart" style="height:600px;"></div>
+            <div id="pressureChart" style="height:600px;"></div>
         </div>
 
         <footer>
@@ -110,9 +110,9 @@
                 const start = document.getElementById('start').value;
                 const end = document.getElementById('end').value;
 
-                let url = '/api/data/Data/alldata';
+                let url = 'https://ccflock.duckdns.org/api/localweather/alldata';
                 if (start && end) {
-                    url = `/api/data/Data/getdatarange?StartDateTime=${encodeURIComponent(start)}&EndDateTime=${encodeURIComponent(end)}`;
+                    url = `https://ccflock.duckdns.org/api/localweather/getdatarange?StartDateTime=${encodeURIComponent(start)}&EndDateTime=${encodeURIComponent(end)}`;
                 }
 
                 try {
@@ -143,8 +143,17 @@
                             continue;
                         }
 
-                        const time = new Date(entry.dateTimeStampID).toISOString();
-                        labels.push(time);
+                        // const time = new Date(new Date(entry.dateTimeStampID).getTime() - 4 * 60 * 60 * 1000).toISOString();
+                        const time = new Date(new Date(entry.dateTimeStampID).getTime() - 4 * 60 * 60 * 1000)
+                        .toLocaleString('en-US', {
+                            timeZone: 'America/New_York',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit',
+                            hour12: true
+                        });
+                        labels.push(new Date(entry.dateTimeStampID).getTime() - 4 * 60 * 60 * 1000);
                         temp.push(entry.temp);
                         humidity.push(entry.humidity);
                         pressure.push(entry.pressure);
@@ -167,7 +176,18 @@
                             fixedrange: true,
                             range: [-30,120], // or: range: [20, 30] based on typical values
                             tickfont: { color: 'white' },
-                            title: { text: 'Temperature (°C)', font: { color: 'white' } }
+                            title: { text: 'Temperature (°F)', font: { color: 'white' } },
+                            gridcolor: '#444',
+                            gridwidth: '1.5'
+                        },
+                        xaxis: {
+                            type: 'date',
+                            tickformat: "%b %d %I:%M %p",  // example: Jun 12 03:45 PM
+                            tickfont: { color: 'white' },
+                            title: { text: 'Time (EST)', font: { color: 'white' } },
+                            tickfont: { color: 'white' },
+                            gridcolor: '#444',      // Makes vertical grid lines more visible
+                            gridwidth: 1.5
                         }
                     });
 
@@ -188,7 +208,18 @@
                             fixedrange: true,
                             range: [0,100], // or: range: [20, 30] based on typical values
                             tickfont: { color: 'white' },
-                            title: { text: '% Humidity', font: { color: 'white' } }
+                            title: { text: '% Humidity', font: { color: 'white' } },
+                            gridcolor: '#444',
+                            gridwidth: '1.5'
+                        },
+                        xaxis: {
+                            type: 'date',
+                            tickformat: "%b %d %I:%M %p",  // example: Jun 12 03:45 PM
+                            tickfont: { color: 'white' },
+                            title: { text: 'Time (EST)', font: { color: 'white' } },
+                            tickfont: { color: 'white' },
+                            gridcolor: '#444',      // Makes vertical grid lines more visible
+                            gridwidth: 1.5
                         }
                     });
 
@@ -209,7 +240,18 @@
                             fixedrange: true,
                             range: [700,1200], // or: range: [20, 30] based on typical values
                             tickfont: { color: 'white' },
-                            title: { text: ' hPa', font: { color: 'white' } }
+                            title: { text: ' hPa', font: { color: 'white' } },
+                            gridcolor: '#444',
+                            gridwidth: '1.5'
+                        },
+                        xaxis: {
+                            type: 'date',
+                            tickformat: "%b %d %I:%M %p",  // example: Jun 12 03:45 PM
+                            tickfont: { color: 'white' },
+                            title: { text: 'Time (EST)', font: { color: 'white' } },
+                            tickfont: { color: 'white' },
+                            gridcolor: '#444',      // Makes vertical grid lines more visible
+                            gridwidth: 1.5
                         }
                     });
 
