@@ -116,7 +116,16 @@
                 }
 
                 try {
-                    const res = await fetch(url);
+                    // curl -X 'GET' \
+                    // 'http://192.168.1.160:8001/api/data/Data/alldata' \
+                    // -H 'accept: */*'
+
+                    const res = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'accept': '*/*'
+                        }
+                    });
                     const json = await res.json();
                     console.log("RESULT: ", res);
                     console.log("JSON: ", json);
