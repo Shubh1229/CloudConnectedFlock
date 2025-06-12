@@ -9,7 +9,7 @@ public partial class Useraccount
 
     public string Username { get; set; } = null!;
 
-    public DateTime Birthday { get; set; }
+    public DateOnly Birthday { get; set; }
 
     public string Email { get; set; } = null!;
 

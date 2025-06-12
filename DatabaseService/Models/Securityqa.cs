@@ -7,7 +7,7 @@ public partial class Securityqa
 {
     public Guid Id { get; set; }
 
-    public byte[] Securitykey { get; set; } = null!;
+    public List<byte[]> Securitykey { get; set; } = null!;
 
     public List<byte[]> Securityhasharray { get; set; } = null!;
 

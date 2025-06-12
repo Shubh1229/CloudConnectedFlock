@@ -1,5 +1,61 @@
 syntax = "proto3";
 
 option csharp_namespace = "DatabaseService.Profiledb";
-
 package profile;
+
+service ProfileDatabaseService {
+  rpc GetProfile (ProfileUsernameRequest) returns (ProfileReply);
+  rpc UpdateProfile (ProfileUpdateRequest) returns (ProfileReply);
+  rpc AddProfile (ProfileUsernameRequest) returns (OperationStatusReply);
+  rpc UpdateResumePath (ProfileFileUpdateRequest) returns (OperationStatusReply);
+  rpc UpdateProfilePicPath (ProfileFileUpdateRequest) returns (OperationStatusReply);
+  rpc DeleteProfile (ProfileUsernameRequest) returns (OperationStatusReply);
+  rpc GetAllUsers (Empty) returns (AllUsersReply);
+}
+
+message ProfileUsernameRequest {
+  string username = 1;
+}
+
+message ProfileUpdateRequest {
+  string username = 1;
+  string newUsername = 2;
+  string firstName = 3;
+  string lastName = 4;
+  string bio = 5;
+  string personalLinks = 6;
+  string resumeFilePath = 7;
+  string profilePicturePath = 8;
+}
+
+message ProfileReply {
+  string username = 1;
+  string firstName = 2;
+  string lastName = 3;
+  string bio = 4;
+  string personalLinks = 5;
+  string resumeFilePath = 6;
+  string profilePicturePath = 7;
+  bool canEdit = 8;
+}
+
+message ProfileFileUpdateRequest {
+  string username = 1;
+  string filePath = 2;
+}
+
+message AllUsersReply {
+  repeated UserSummary users = 1;
+}
+
+message UserSummary {
+  string username = 1;
+  string profilePicPath = 2;
+}
+
+message OperationStatusReply {
+  bool success = 1;
+  string message = 2;
+}
+
+message Empty {}

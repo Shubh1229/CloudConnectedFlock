@@ -1,19 +1,4 @@
 services:
-
-    account-service:
-        platform: linux/amd64
-        build:
-            context: ../AccountService
-            dockerfile: Dockerfile
-        ports:
-            - "9000:9000"
-        environment:
-            - ConnectionStrings__DefaultConnection=Host=ccflock-db;Port=5432;Database=ccflockdb;Username=shubh;Password=8342AdksnAKe
-            - Jwt__Key=7bATceklEQce5y28HMFU1YwYJcBna4Jz
-        depends_on:
-            - profile-service
-        networks:
-            - ccflocknet
     
     login-service:
         platform: linux/amd64
